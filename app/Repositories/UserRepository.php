@@ -76,17 +76,17 @@ class UserRepository implements UserRepositoryInterface
         return User::find($id)->delete();
     }
 
-    public function createUser($u)
+    public function createUser($user)
     {
         try {
             $newUser = new User;
-            $newUser->name = $u->name;
-            $newUser->login = $u->login;
-            $newUser->email = $u->email;
-            $newUser->password = \Hash::make($u->password);
-            $newUser->phone = $u->phone;
-            $newUser->address = $u->address;
-            $newUser->avatar = $u->avatar;
+            $newUser->name = $user->name;
+            $newUser->login = $user->login;
+            $newUser->email = $user->email;
+            $newUser->password = \Hash::make($user->password);
+            $newUser->phone = $user->phone;
+            $newUser->address = $user->address;
+            $newUser->avatar = $user->avatar;
             // $newUser->email = preg_replace('/\s+/', '', strtolower($request->email));
             $newUser->save();
 

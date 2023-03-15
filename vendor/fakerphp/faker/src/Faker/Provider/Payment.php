@@ -74,7 +74,7 @@ class Payment extends Base
      * @var array list of IBAN formats, source: @see https://www.swift.com/standards/data-standards/iban
      */
     protected static $ibanFormats = [
-        'AD' => [['n', 4],    ['n', 4],  ['c', 12]],
+        'Ad' => [['n', 4],    ['n', 4],  ['c', 12]],
         'AE' => [['n', 3],    ['n', 16]],
         'AL' => [['n', 8],    ['c', 16]],
         'AT' => [['n', 5],    ['n', 11]],

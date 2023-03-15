@@ -27,7 +27,7 @@ class Person extends \Faker\Provider\Person
     ];
 
     protected static $suffix = [
-        'BA', 'Bsc', 'LLB', 'LLM', 'MA', 'Msc', 'MPhil', 'D', 'PhD', 'AD', 'B', 'M',
+        'BA', 'Bsc', 'LLB', 'LLM', 'MA', 'Msc', 'MPhil', 'D', 'PhD', 'Ad', 'B', 'M',
     ];
 
     protected static $prefix = ["'s", "'t", 'a', 'aan', "aan 't", 'aan de', 'aan den', 'aan der', 'aan het',

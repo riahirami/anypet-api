@@ -13,7 +13,7 @@
  * ISO 3166-2
  */
 return [
-    'AD' => 'Andorra',
+    'Ad' => 'Andorra',
     'AE' => 'United Arab Emirates',
     'AF' => 'Afghanistan',
     'AG' => 'Antigua and Barbuda',
