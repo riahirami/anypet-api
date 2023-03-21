@@ -4,16 +4,37 @@ namespace  App\Repositories;
 
 use App\Models\Category ;
 use Illuminate\Http\Request;
-class CategoryRepository implements CategoryRepositoryInterface {
+class CategoryRepository{
     protected $category = null;
+
+
+    //listing
+    public  function  index()
+    {
+              $value = "";
+              $categories =   Category::byTitle($value)
+                                        ->byName($value)
+                                        ->byDate($value)
+                                        ->get();
+    }
+
+    public function create(array $data)
+    {
+
+            $category = new Category();
+            $category->title = $data['title'];
+            $category->description = $data['description'];
+            $category->save();
+            return $category;
+
+
+    }
 
     public function getAllCategories()
     {
-        $category = Category::all();
-        return response()->json([
-            'status' => 'success',
-            'categories' => $category,
-        ]);
+        $category = Category::All();
+        return $category;
+
     }
 
     public function createCategory(Request $request)

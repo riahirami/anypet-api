@@ -3,25 +3,40 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
-class AuthRepository implements AuthRepositoryInterface
+class AuthRepository
 {
 
-    public function me()
+    public function profile()
     {
         $user = Auth::user();
         $token = Auth::login($user);
 
+        if( $token){
+
         return response()->json([
-            'request' => 'me',
+            'request' => 'profile',
             'status' => 'success',
-            'user email' => $user->email,
             'user login' => $user->login,
+            'user password' => $user->getAuthPassword(),
             'token' => $token
         ]);
+        }else{
+            return response()->json([
+                'request' => 'me',
+                'status' => 'error'
+
+            ]);
+        }
     }
 
     public function login(Request $request)
@@ -50,18 +65,21 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function register(Request $request)
     {
-        if (Auth::user()) {
+        if (!Auth::user()) {
             $user = User::create([
                 'name' => $request->name,
                 'login' => $request->login,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+//                'password' => $request->password,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'avatar' => $request->avatar,
             ]);
 
+
             $token = Auth::login($user);
+            event(new Registered($user));
             return response()->json([
                 'status' => 'success',
                 'message' => 'User created successfully',
@@ -105,4 +123,59 @@ class AuthRepository implements AuthRepositoryInterface
             ]
         ]);
     }
+
+    public function SendEmailVerification (EmailVerificationRequest $request) {
+        $request->fulfill();
+        return "you are redirect by email verify link ";
+    }
+
+    public function ResendEmailVerification (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return "Verification link re-sent!";
+    }
+
+    public function forgotPassword(Request $request){
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status == Password::RESET_LINK_SENT) {
+            return [
+                'status' => __($status)
+            ];
+        }
+
+        throw ValidationException::withMessages([
+            'email' => [trans($status)],
+        ]);
+    }
+
+    public function resetPassword(Request $request){
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+//                    'password' => $request->password,
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return response([
+                'message'=> 'Password reset successfully'
+            ]);
+        }
+
+        return response([
+            'message'=> __($status)
+        ], 500);
+
+    }
+
 }

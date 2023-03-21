@@ -13,7 +13,7 @@ use App\Http\Controllers\Web\Auth\UserController;
 |
 */
 Route::get('/users', [UserController::class, 'showUsers'])->name('user.list');
-Route::get('/users/{id}', [UserController::class, 'getUser'])->name('user.list');
+Route::get('/users/{id}', [UserController::class, 'getUser'])->name('user.byid');
 // Route::get('/user/add/{name}/{login}/{email}/{password}/{phone}/{address}', [UserController::class,'createUser'])->name('user.create');
 Route::get('/user/registre', [UserController::class,'registreUser'])->name('user.create');
 Route::post('/user/create', [UserController::class,'saveUser']);
@@ -24,3 +24,4 @@ Route::get('/user/delete/{id}', [UserController::class,'deleteUser'])->name('use
 Route::get('/anypet', function () {
     return view('welcome');
 });
+

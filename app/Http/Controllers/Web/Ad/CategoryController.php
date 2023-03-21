@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Web\Ad;
 
-use App\Repositories\CategoryRepositoryInterface;
+//use App\Repositories\CategoryRepositoryInterface;
+use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Http\Traits\CategoryTrait;
 
 class CategoryController extends \App\Http\Controllers\Controller
 {
     private $category;
+    use CategoryTrait;
 
-    public function __construct(CategoryRepositoryInterface $category)
+    public function __construct(CategoryRepository $category)
     {
         $this->middleware('auth:api');
         $this->category = $category;
@@ -19,23 +22,24 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     public function index()
     {
-        return $category = $this->category->getAllCategories();
+        $category = $this->category->getAllCategories();
+        return response()->json(['data' => $category,], 200);
 
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|min:3|max:255',
-            'description' => 'required|string|min:12|max:255'
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|min:3|max:255',
+                'description' => 'required|string|min:12|max:255'
+            ]);
+            $category = $this->category->create($this->getFillderRequest($request));
+            return response()->json(['category' => $category], 201);
 
-        return $category = Category::create([
-            'title' => $request->title,
-            'description' => $request->description,
-        ]);
-
-
+        } catch (Exception $exception) {
+            return response()->json(['message' => __('message.error')], 400);
+        }
     }
 
     public function show($id)

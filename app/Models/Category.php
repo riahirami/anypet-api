@@ -8,4 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'description'];}
+
+    const ACTIVE = 1;
+     const INACTIVE = 0;
+
+    protected $fillable = ['title', 'description', 'status'];
+
+  public function scopeByTitle($query, $value){
+    return $query->where('title', $value);
+}
+
+public function isActive(){
+      return $this->status === self::ACTIVE;
+}
+
+
+
+}
