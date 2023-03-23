@@ -26,8 +26,7 @@ class AuthRepository
         return response()->json([
             'request' => 'profile',
             'status' => 'success',
-            'user login' => $user->login,
-            'user password' => $user->getAuthPassword(),
+            'user email' => Auth::user()->email,
             'token' => $token
         ]);
         }else{
@@ -71,7 +70,6 @@ class AuthRepository
                 'login' => $request->login,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-//                'password' => $request->password,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'avatar' => $request->avatar,

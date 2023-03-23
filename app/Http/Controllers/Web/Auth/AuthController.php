@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Web\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\AuthForgotPasswordeRequest;
+use App\Http\Requests\Auth\AuthLoginRequest;
+use App\Http\Requests\Auth\AuthRegistreRequest;
+use App\Http\Requests\Auth\AuthResetPasswordeRequest;
 use App\Repositories\AuthRepository;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
@@ -35,28 +39,16 @@ class AuthController extends Controller
         return $this->auth->profile();
     }
 
-    public function login(Request $request)
+    public function login(AuthLoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        $validatedRequest = $request->validated();
         return $this->auth->login($request);
 
     }
 
-    public function register(Request $request): JsonResponse
+    public function register(AuthRegistreRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|min:4|max:255',
-            'login' => 'required|string|min:4|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:5',
-            'phone' => 'required|string|min:8|max:255',
-            'address' => 'required|string|max:255',
-            'avatar' => 'required|string|max:255',
-
-        ]);
+        $validatedRequest = $request->validated();
         return $this->auth->register($request);
     }
 
@@ -77,22 +69,16 @@ class AuthController extends Controller
     public function ResendEmailVerification(Request $request){
         return $this->auth->ResendEmailVerification($request);
     }
-    public function forgotPassword(Request $request)
+    public function forgotPassword(AuthForgotPasswordeRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-       return $this->auth->forgotPassword($request);
+        $validatedRequest = $request->validated();
+        return $this->auth->forgotPassword($request);
     }
 
-    public function reset(Request $request)
+    public function reset(AuthResetPasswordeRequest $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => ['required', 'confirmed', RulesPassword::defaults()],
-        ]);
+        $validatedRequest = $request->validated();
+
 
         return $this->auth->resetPassword($request);
 
