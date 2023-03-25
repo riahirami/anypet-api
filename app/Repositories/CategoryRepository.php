@@ -1,33 +1,33 @@
 <?php
 
-namespace  App\Repositories;
+namespace App\Repositories;
 
-use App\Models\Category ;
+use App\Http\Requests\CategoryRequest;
+use App\Models\Category;
 use Illuminate\Http\Request;
-class CategoryRepository{
+
+class CategoryRepository
+{
     protected $category = null;
 
 
     //listing
-    public  function  index()
+    public function index()
     {
-              $value = "";
-              $categories =   Category::byTitle($value)
-                                        ->byName($value)
-                                        ->byDate($value)
-                                        ->get();
+//              $value = "";
+//              $categories =   Category::byTitle($value)
+//                                        ->byName($value)
+//                                        ->byDate($value)
+//                                        ->get();
     }
 
     public function create(array $data)
     {
-
-            $category = new Category();
-            $category->title = $data['title'];
-            $category->description = $data['description'];
-            $category->save();
-            return $category;
-
-
+        $category = new Category();
+        $category->title = $data['title'];
+        $category->description = $data['description'];
+        $category->save();
+        return $category;
     }
 
     public function getAllCategories()
@@ -37,88 +37,30 @@ class CategoryRepository{
 
     }
 
-    public function createCategory(Request $request)
-    {
-
-        try {
-
-            $newCategory = new Category();
-            $newCategory->title = $request->title;
-            $newCategory->description =$request->description;
-            $newCategory->save();
-
-            return response()->json([
-                'message' => 'User created',
-                'code' => 200,
-                'error' => false,
-                'results' => $newCategory
-            ], 201);
-        } catch(\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-                'error' => true,
-                'code' => 500
-            ], 500);
-        }
-    }
-
     public function getCategoryById($id)
     {
-        try {
-            $category = Category::find($id);
-            if($category) {
+        $category = Category::find($id);
+        return $category;
 
-                return response()->json([
-                    'message' => 'category find',
-                    'code' => 200,
-                    'error' => false,
-                    'results' => $category
-                ], 201);
-            }
-            else {
-                return response()->json([
-                    'message' => "no category found",
-                    'error' => true,
-                    'code' => 500
-                ], 500);
-            }
-
-        } catch(\Exception $e) {
-            return response()->json([
-                'message' => "error",
-                'error' => true,
-                'code' => 500
-            ], 500);
-        }
 
     }
 
-    public function UpdateCategory(Request $request, $id)
+    public function UpdateCategory(CategoryRequest $request, $id)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-        ]);
+
+        $validated = $request->validated();
 
         $category = Category::find($id);
         $category->title = $request->title;
         $category->description = $request->description;
         $category->save();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'category updated successfully',
-            'todo' => $category,
-        ]);
+        return $category;
     }
 
     public function deleteCategory($id)
     {
         $category = Category::find($id)->delete();
-        return     response()->json([
-        'status' => 'success',
-        'message' => 'category deleted successfully',
-        'todo' => $category,
-    ]);
+        return $category;
     }
 }

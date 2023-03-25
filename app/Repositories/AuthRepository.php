@@ -2,6 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Http\Requests\Auth\AuthForgotPasswordeRequest;
+use App\Http\Requests\Auth\AuthLoginRequest;
+use App\Http\Requests\Auth\AuthRegistreRequest;
+use App\Http\Requests\Auth\AuthResetPasswordeRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -18,51 +22,20 @@ class AuthRepository
 
     public function profile()
     {
-        $user = Auth::user();
-        $token = Auth::login($user);
-
-        if( $token){
-
-        return response()->json([
-            'request' => 'profile',
-            'status' => 'success',
-            'user email' => Auth::user()->email,
-            'token' => $token
-        ]);
-        }else{
-            return response()->json([
-                'request' => 'me',
-                'status' => 'error'
-
-            ]);
-        }
+        //        $token = Auth::login($user);
+        return Auth::user();
     }
 
-    public function login(Request $request)
+    public function login(AuthLoginRequest $request)
     {
 
-        $credentials = $request->only('email', 'password');
-
+        $credentials = $request->validated();
         $token = Auth::attempt($credentials);
-        if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
-        }
+        return $token;
 
-        $user = Auth::user();
-        return response()->json([
-            'status' => 'success',
-            'user' => $user->email,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ]);
     }
 
-    public function register(Request $request)
+    public function register(AuthRegistreRequest $request)
     {
         if (!Auth::user()) {
             $user = User::create([
@@ -74,105 +47,68 @@ class AuthRepository
                 'address' => $request->address,
                 'avatar' => $request->avatar,
             ]);
-
-
-            $token = Auth::login($user);
             event(new Registered($user));
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User created successfully',
-                'user' => $user,
-                'authorisation' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                ]
-            ]);
+            return $user;
         }
-        return response()->json([
-            'status' => 'error',
-            'message' => 'ye are already logged in',
-
-        ]);
     }
 
     public function logout()
     {
         if (Auth::user()) {
-            Auth::logout();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Successfully logged out',
-
-            ]);
+           return Auth::logout();
         }
-        return response()->json([
-            'status' => 'error',
-            'message' => 'error',
-        ]);    }
+        return null ;
+
+    }
 
     public function refresh()
     {
-        return response()->json([
-            'status' => 'success',
-            'user' => Auth::user(),
-            'authorisation' => [
-                'token' => Auth::refresh(),
-                'type' => 'bearer',
-            ]
-        ]);
+        return Auth::refresh();
     }
 
-    public function SendEmailVerification (EmailVerificationRequest $request) {
-        $request->fulfill();
-        return "you are redirect by email verify link ";
+    public function SendEmailVerification(EmailVerificationRequest $request)
+    {
+         $request->fulfill();
     }
 
-    public function ResendEmailVerification (Request $request) {
-        $request->user()->sendEmailVerificationNotification();
-        return "Verification link re-sent!";
+    public function ResendEmailVerification(Request $request)
+    {
+            return   $request->user()->sendEmailVerificationNotification();
+
     }
 
-    public function forgotPassword(Request $request){
+    public function forgotPassword(AuthForgotPasswordeRequest $request)
+    {
         $status = Password::sendResetLink(
-            $request->only('email')
+            $request->validated()
         );
-
         if ($status == Password::RESET_LINK_SENT) {
-            return [
-                'status' => __($status)
-            ];
+            return $status;
         }
-
         throw ValidationException::withMessages([
             'email' => [trans($status)],
         ]);
     }
 
-    public function resetPassword(Request $request){
+    public function resetPassword(AuthResetPasswordeRequest $request)
+    {
         $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $request->validated(),
             function ($user) use ($request) {
                 $user->forceFill([
                     'password' => Hash::make($request->password),
-//                    'password' => $request->password,
                     'remember_token' => Str::random(60),
                 ])->save();
-
                 $user->tokens()->delete();
-
                 event(new PasswordReset($user));
             }
         );
 
         if ($status == Password::PASSWORD_RESET) {
-            return response([
-                'message'=> 'Password reset successfully'
-            ]);
+            return $status;
         }
 
-        return response([
-            'message'=> __($status)
-        ], 500);
+        return null ;
 
     }
 

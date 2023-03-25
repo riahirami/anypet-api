@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Web\Ad;
 
-//use App\Repositories\CategoryRepositoryInterface;
 use App\Http\Requests\CategoryRequest;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
@@ -42,20 +41,51 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     public function show($id)
     {
-        return $category = $this->category->getCategoryById($id);
+        $category = $this->category->getCategoryById($id);
+
+        try {
+            if (!$category) {
+                return response()->json([
+                    'message' => "no category found",
+                ], 500);
+
+            }
+            return response()->json([
+                'results' => $category
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => "error",], 500);
+        }
 
     }
 
-    public function update(CategoryRequest $request, $id)
+    public
+    function update(CategoryRequest $request, $id)
     {
         $validated = $request->validated();
 
-        return $category = $this->category->UpdateCategory($request, $id);
+        $category = $this->category->UpdateCategory($request, $id);
+        if ($category) {
+            return response()->json([
+                'message' => 'category updated successfully',
+                'category' => $category,
+            ]);
+        }
+        return response()->json(['message' => "error",], 500);
+
     }
 
-    public function destroy($id)
+    public
+    function destroy($id)
     {
-        return $category = $this->category->deleteCategory($id);
+        $category = $this->category->deleteCategory($id);
+        if ($category) {
+            return response()->json([
+                'message' => 'category deleted successfully',
+                'category' => $category,
+            ]);
+        }
+        return response()->json(['message' => "error",], 500);
 
 
     }
