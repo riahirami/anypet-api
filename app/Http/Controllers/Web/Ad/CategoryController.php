@@ -22,8 +22,10 @@ class CategoryController extends \App\Http\Controllers\Controller
     public function index()
     {
         $category = $this->category->getAllCategories();
-        return response()->json(['data' => $category,], 200);
-
+        if($category) {
+            return response()->json(['data' => $category,], 200);
+        }
+        return  response()->json(['message' => "no data found !",], 500);
     }
 
     public function store(CategoryRequest $request)
@@ -35,7 +37,7 @@ class CategoryController extends \App\Http\Controllers\Controller
             return response()->json(['category' => $category], 201);
 
         } catch (Exception $exception) {
-            return response()->json(['message' => __('message.error')], 400);
+            return response()->json(['message' => __('message.error')], 500);
         }
     }
 
