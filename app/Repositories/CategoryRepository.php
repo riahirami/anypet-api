@@ -49,18 +49,31 @@ class CategoryRepository
     {
 
         $validated = $request->validated();
+        try {
+            $category = Category::find($id);
+            $category->title = $request->title;
+            $category->description = $request->description;
+            $category->save();
 
-        $category = Category::find($id);
-        $category->title = $request->title;
-        $category->description = $request->description;
-        $category->save();
+            return response()->json([
+                'category' => $category
+            ], 201);}
+        catch
+            (\Exception $e) {
+                return response()->json(['message' => "error",], 500);
+            }
 
-        return $category;
     }
 
     public function deleteCategory($id)
     {
-        $category = Category::find($id)->delete();
-        return $category;
+        try {
+            $category = Category::find($id)->delete();
+            return response()->json([
+                'category' => $category
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => "error",], 500);
+        }
     }
 }
