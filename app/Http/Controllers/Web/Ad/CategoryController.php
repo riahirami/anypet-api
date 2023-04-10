@@ -53,7 +53,7 @@ class CategoryController extends \App\Http\Controllers\Controller
 
             }
             return response()->json([
-                'results' => $category
+                'data' => $category
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => "error",], 500);
