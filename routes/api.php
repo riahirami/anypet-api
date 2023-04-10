@@ -17,10 +17,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 |
 */
 
-//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login')->name('login');
@@ -32,20 +28,9 @@ Route::controller(AuthController::class)->group(function () {
 });
 Route::get('/email/verify',[AuthController::class,'profile']) ->middleware('auth')->name('verification.notice');
 
-
-
 Route::get('email/verify/{id}/{hash}', [AuthController::class,'SendEmailVerification'])->name('verification.verify');
 Route::post('email/resend-verification', [AuthController::class,'ResendEmailVerification'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'reset'])->name('password.reset');
 
-Route::controller(CategoryController::class)->group(function () {
-    Route::get('categories', 'index')->middleware(['auth','verified']);
-    Route::post('addcategory', 'store')->middleware(['auth','verified']);
-    Route::get('show/categories/{id}', 'show')->middleware(['auth','verified']);
-    Route::put('update/categories/{id}', 'update')->middleware(['auth','verified']);
-    Route::delete('delete/categories/{id}', 'destroy')->middleware(['auth','verified']);
-});
-//Auth::routes([
-//    'verify' => true
-//]);
+
