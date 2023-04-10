@@ -37,15 +37,15 @@ class AuthController extends Controller
     {
         $user = $this->auth->profile();
 
-        if ($user) {
+        if ($user->hasVerifiedEmail()) {
 
             return response()->json([
                 'message' => 'success',
-                'user email' => Auth::user()->email,
+                'user' => Auth::user(),
             ], 201);
         }
         return response()->json([
-            'message' => 'error access profile'
+            'message' => 'error access profile, check your email to verify your account !'
 
         ], 500);
     }
@@ -56,7 +56,8 @@ class AuthController extends Controller
         $user = $this->auth->login($request);
         if ($user) {
             return response()->json([
-                'user' => $user,
+                'name' => Auth::user()->name,
+                'token' => $user,
                 'message' => 'ye are logged in',
 
             ], 201);
