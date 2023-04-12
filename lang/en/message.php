@@ -14,4 +14,17 @@ return [
     */
     'error' => 'soory we can not complete u request this time',
 
+    'errorShowAllAds' => 'Problem occured while listing ads',
+    'errorfindAd' => 'Problem occured, no ad founded',
+    'errorCreateAd' => 'Problem occured while creating ads',
+    'errorUpdateAd' => 'Problem occured while updating ads',
+    'errorDeleteAd' => 'Problem occured while deleting ads',
+
+    'errorShowAllCategory' => 'Problem occured while listing categories',
+    'errorfindCategory' => 'Problem occured, no category founded',
+    'errorCreateCategory' => 'Problem occured while creating category',
+    'errorUpdatecategory' => 'Problem occured while updating category',
+    'errorDeletecategory' => 'Problem occured while deleting category',
+
+
 ];

@@ -21,11 +21,12 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     public function index()
     {
-        $category = $this->category->getAllCategories();
-        if($category) {
+        try {
+            $category = $this->category->getAllCategories();
             return response()->json(['data' => $category,], 200);
+        } catch (Exception $exception) {
+            return response()->json(['message' => trans('message.errorShowAllCategory')], 500);
         }
-        return  response()->json(['message' => "no data found !",], 500);
     }
 
     public function store(CategoryRequest $request)
@@ -37,7 +38,7 @@ class CategoryController extends \App\Http\Controllers\Controller
             return response()->json(['category' => $category], 201);
 
         } catch (Exception $exception) {
-            return response()->json(['message' => __('message.error')], 500);
+            return response()->json(['message' => trans('message.errorCreateCategory')], 500);
         }
     }
 
@@ -46,17 +47,12 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->getCategoryById($id);
 
         try {
-            if (!$category) {
-                return response()->json([
-                    'message' => "no category found",
-                ], 500);
 
-            }
             return response()->json([
                 'data' => $category
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
+            return response()->json(['message' => trans('message.errorfindCategory')], 500);
         }
 
     }
@@ -69,11 +65,10 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->UpdateCategory($request, $id);
         if ($category) {
             return response()->json([
-                'message' => 'category updated successfully',
                 'category' => $category,
-            ]);
+            ], 201);
         }
-        return response()->json(['message' => "error",], 500);
+        return response()->json(['message' => trans('message.errorUpdatecategory')], 500);
 
     }
 
@@ -83,11 +78,10 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->deleteCategory($id);
         if ($category) {
             return response()->json([
-                'message' => 'category deleted successfully',
                 'category' => $category,
-            ]);
+            ], 200);
         }
-        return response()->json(['message' => "error",], 500);
+        return response()->json(['message' => trans('message.errorDeletecategory')], 500);
 
 
     }

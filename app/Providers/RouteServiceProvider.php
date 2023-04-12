@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/Ad/api.php'));
 
             Route::middleware('api')
-                ->prefix('category')
+                ->prefix('categories')
                 ->group(base_path('routes/Category/api.php'));
         });
     }

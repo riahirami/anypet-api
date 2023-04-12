@@ -32,7 +32,7 @@ class CategoryRepository
 
     public function getAllCategories()
     {
-        $category = Category::All();
+        $category = Category::orderBy('title')->cursorPaginate(10);
         return $category;
 
     }

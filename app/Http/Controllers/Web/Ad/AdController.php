@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web\Ad;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ad\AdRequest;
+use App\Http\Traits\AdTrait;
 use App\Models\Ad;
 use App\Models\Category;
 use App\Repositories\AdRepository;
@@ -12,7 +13,7 @@ use Illuminate\Http\Request;
 class AdController extends Controller
 {
     protected $adRepository;
-
+use AdTrait;
     public function __construct(AdRepository $adRepository)
     {
         $this->adRepository = $adRepository;
@@ -20,11 +21,12 @@ class AdController extends Controller
 
     public function index()
     {
-        $ads = $this->adRepository->all();
-        if ($ads) {
-            return response()->json(['ads' => $ads,], 201);
+        try {
+            $ads = $this->adRepository->all();
+            return response()->json(['ads' => $ads,], 200);
+        } catch (Exception $exception) {
+            return response()->json(['message' => trans('message.errorShowAllAds')], 500);
         }
-        return response()->json(['message' => "no data found !",], 500);
     }
 
 
@@ -32,13 +34,12 @@ class AdController extends Controller
     {
         try {
             $validated = $request->validated();
-            $ad = $this->adRepository->create($request->all());
+            $ad = $this->adRepository->create($this->getFillderRequest($request));
             return response()->json([
-                'message' => 'ad added successfully',
                 'ad' => $ad,
             ], 201);
         } catch (Exception $exception) {
-            return response()->json(['message' => __('message.error')], 500);
+            return response()->json(['message' => trans('message.errorCreateAd')], 500);
         }
     }
 
@@ -57,7 +58,7 @@ class AdController extends Controller
                 'ad' => $ad
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
+            return response()->json(['message' => trans('message.errorfindAd')], 500);
         }
 
     }
@@ -68,13 +69,13 @@ class AdController extends Controller
         try {
             $validated = $request->validated();
 
-            $ad = $this->adRepository->update($request->all(), $id);
+            $ad = $this->adRepository->update($this->getFillderRequest($request), $id);
             return response()->json([
                 'message' => 'ad updated successfully',
                 'ad' => $ad
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => "error to update your ad",], 500);
+            return response()->json(['message' => trans('message.errorUpdateAd')], 500);
         }
     }
 
@@ -88,7 +89,7 @@ class AdController extends Controller
                 'ad' => $ad
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
+            return response()->json(['message' => trans('message.errorDeleteAd')], 500);
         }
 
     }
