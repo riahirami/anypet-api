@@ -1,19 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\Web\Ad;
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
-use App\Models\Ad;
-use App\Models\Category;
 use App\Repositories\AdRepository;
+use Exception;
 use Illuminate\Http\Request;
 
 class AdController extends Controller
 {
     protected $adRepository;
-use AdTrait;
+    use AdTrait;
+
     public function __construct(AdRepository $adRepository)
     {
         $this->adRepository = $adRepository;
@@ -30,11 +29,10 @@ use AdTrait;
     }
 
 
-    public function store(AdRequest $request)
+    public function store(Request $request)
     {
         try {
-            $validated = $request->validated();
-            $ad = $this->adRepository->create($this->getFillderRequest($request));
+            $ad = $this->adRepository->create($this->getFillerRequest($request));
             return response()->json([
                 'ad' => $ad,
             ], 201);
@@ -64,12 +62,10 @@ use AdTrait;
     }
 
 
-    public function update(AdRequest $request, $id)
+    public function update(Request $request, $id)
     {
         try {
-            $validated = $request->validated();
-
-            $ad = $this->adRepository->update($this->getFillderRequest($request), $id);
+            $ad = $this->adRepository->update($request, $id);
             return response()->json([
                 'message' => 'ad updated successfully',
                 'ad' => $ad
@@ -100,7 +96,7 @@ use AdTrait;
             $ads = $this->adRepository->getAdsByDate($date);
             return response()->json([
                 'ads' => $ads
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => "no data found for this date",], 500);
         }

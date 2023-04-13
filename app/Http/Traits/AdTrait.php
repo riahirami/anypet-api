@@ -1,16 +1,16 @@
 <?php
 namespace App\Http\Traits;
+use App\Http\Requests\Ad\AdRequest;
 use Illuminate\Http\Request;
 
-Trait AdTrait
+trait AdTrait
 {
-
-    public function getFillderRequest(Request $request)
+    public function getFillerRequest(Request $request)
     {
+
         return [
             'title' => $request->title,
             'description' => $request->description,
-            'status' => $request->status,
             'country' => $request->country,
             'state' => $request->state,
             'city' => $request->city,
@@ -18,5 +18,4 @@ Trait AdTrait
             'postal_code' => $request->postal_code
         ];
     }
-
 }

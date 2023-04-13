@@ -22,13 +22,14 @@ class AdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|min:3|max:30',
-            'description' => 'required|string|min:12|max:255',
-            'country' => 'required|string|min:5|max:30',
-            'state' => 'required|string|min:3|max:30',
-            'city' => 'required|string|min:3|max:30',
-            'street' => 'required|string|min:3|max:30',
-            'postal_code' => 'required|string|min:3|max:12',
+            'title' => ['required', 'string', 'min:3', 'max:30'],
+            'description' => ['required', 'string', 'min:12', 'max:255'],
+            'status' => ['nullable', 'integer', 'min:0', 'max:1'],
+            'country' => ['required', 'string', 'min:5', 'max:30'],
+            'state' => ['required', 'string', 'min:3', 'max:30'],
+            'city' => ['required', 'string', 'min:3', 'max:30'],
+            'street' => ['required', 'string', 'min:3', 'max:30'],
+            'postal_code' => ['required', 'string', 'min:3', 'max:12'],
         ];
     }
 }

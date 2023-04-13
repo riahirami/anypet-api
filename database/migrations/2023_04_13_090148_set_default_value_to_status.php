@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ads', function (Blueprint $table) {
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->unsignedInteger('status')->default(0)->change();
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-
+        Schema::table('ads', function (Blueprint $table) {
+            $table->unsignedInteger('status')->change();
+        });
     }
 };
