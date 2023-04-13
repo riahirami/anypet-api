@@ -35,6 +35,7 @@ class AdRepository
         $ad->city = $data['city'];
         $ad->street = $data['street'];
         $ad->postal_code = $data['postal_code'];
+        $ad->category_id = $data['category_id'];
         $ad->save();
         return $ad;
 
@@ -79,6 +80,12 @@ class AdRepository
 
     }
 
+    public function getAdsByCategory($categoryId)
+    {
 
+        $ads = Ad::byCategory($categoryId)->get();
+        return $ads;
+
+    }
 }
 

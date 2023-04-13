@@ -108,6 +108,6 @@ class AdController extends Controller
         $ads = $this->adRepository->getAdsByCategory($categoryId);
         return response()->json([
             'ad' => $ads
-        ], 201);
+        ], 200);
     }
 }

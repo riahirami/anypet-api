@@ -15,7 +15,8 @@ trait AdTrait
             'state' => $request->state,
             'city' => $request->city,
             'street' => $request->street,
-            'postal_code' => $request->postal_code
+            'postal_code' => $request->postal_code,
+            'category_id' => $request->category_id
         ];
     }
 }

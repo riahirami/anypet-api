@@ -10,7 +10,7 @@ class Ad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'status','country','state','city','street','postal_code'];
+    protected $fillable = ['title', 'description', 'status','country','state','city','street','postal_code','category_id'];
 
     protected $attributes = [
         'status' => 0,
@@ -27,5 +27,8 @@ class Ad extends Model
         return $query->whereDate('created_at', $formattedDate);
     }
 
-
+    public function scopeByCategory($query, $id)
+    {
+        return $query->where('category_id', $id);
+    }
 }
