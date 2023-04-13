@@ -3,15 +3,20 @@
 namespace App\Repositories;
 
 use App\Http\Requests\Ad\AdRequest;
+use App\Http\Traits\AdTrait;
 use App\Models\Ad;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Traits\CategoryTrait;
 
 class AdRepository
 {
+    use CategoryTrait;
+    use AdTrait;
+
     public function all()
     {
-        $ads = Ad::orderBy('created_at')->cursorPaginate(10);;
+        $ads = $this->queryData(config('constant.cursorPaginate'), 'asc', 'created_at');
         return $ads;
 
     }
@@ -24,18 +29,27 @@ class AdRepository
 
     }
 
-    public function create(array $data)
+    public function create(Request $request)
     {
 
+//        $ad = new Ad();
+//        $ad->title = $data['title'];
+//        $ad->description = $data['description'];
+//        $ad->country = $data['country'];
+//        $ad->state = $data['state'];
+//        $ad->city = $data['city'];
+//        $ad->street = $data['street'];
+//        $ad->postal_code = $data['postal_code'];
+//        $ad->category_id = $data['category_id'];
+//        $ad->save();
         $ad = new Ad();
-        $ad->title = $data['title'];
-        $ad->description = $data['description'];
-        $ad->country = $data['country'];
-        $ad->state = $data['state'];
-        $ad->city = $data['city'];
-        $ad->street = $data['street'];
-        $ad->postal_code = $data['postal_code'];
-        $ad->category_id = $data['category_id'];
+        $data = $this->getFillerRequest($request);
+        $fillable = $ad->getFillable();
+        foreach ($fillable as $field) {
+            if (isset($data[$field])) {
+                $ad->{$field} = $data[$field];
+            }
+        }
         $ad->save();
         return $ad;
 
@@ -43,23 +57,17 @@ class AdRepository
 
     public function update(Request $request, $id)
     {
-
-        try {
-            $ad = Ad::find($id);
-            $ad->title = $request->title;
-            $ad->description = $request->description;
-            $ad->status = $request->status;
-            $ad->country = $request->country;
-            $ad->state = $request->state;
-            $ad->city = $request->city;
-            $ad->street = $request->street;
-            $ad->postal_code = $request->postal_code;
-            $ad->save();
-            return $ad;
-        } catch
-        (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
+        $ad = Ad::find($id);
+        $data = $this->getFillerRequest($request);
+        $fillable = $ad->getFillable();
+        foreach ($fillable as $field) {
+            if (isset($data[$field])) {
+                $ad->{$field} = $data[$field];
+            }
         }
+        $ad->save();
+        return $ad;
+
 
     }
 

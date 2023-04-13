@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web\Ad;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Traits\GlobalTrait;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 use App\Models\Category;
@@ -12,6 +13,8 @@ class CategoryController extends \App\Http\Controllers\Controller
 {
     private $category;
     use CategoryTrait;
+    use GlobalTrait;
+
 
     public function __construct(CategoryRepository $category)
     {
@@ -23,20 +26,20 @@ class CategoryController extends \App\Http\Controllers\Controller
     {
         try {
             $category = $this->category->getAllCategories();
-            return response()->json(['data' => $category,], 200);
+            return $this->returnSuccessResponse(200, ['data' => $category]);
         } catch (Exception $exception) {
-            return response()->json(['message' => trans('message.errorShowAllCategory')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorShowAllCategory'));
         }
     }
 
-    public function store(CategoryRequest $request)
+    public function store(Request $request)
     {
         try {
             $category = $this->category->create($this->getFillderRequest($request));
-            return response()->json(['data' => $category], 201);
+            return $this->returnSuccessResponse(201, ['data' => $category]);
 
         } catch (Exception $exception) {
-            return response()->json(['message' => trans('message.errorCreateCategory')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorCreateCategory'));
         }
     }
 
@@ -45,25 +48,22 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->getCategoryById($id);
 
         try {
-            return response()->json([
-                'data' => $category
-            ], 200);
+            return $this->returnSuccessResponse(200, ['data' => $category]);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => trans('message.errorfindCategory')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorfindCategory'));
         }
 
     }
 
-    public
-    function update(CategoryRequest $request, $id)
+    public function update(Request $request, $id)
     {
         $category = $this->category->UpdateCategory($request, $id);
         if ($category) {
-            return response()->json([
-                'data' => $category,
-            ], 201);
+            return $this->returnSuccessResponse(201, ['data' => $category]);
+
         }
-        return response()->json(['message' => trans('message.errorUpdatecategory')], 500);
+        return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
 
     }
 
@@ -72,11 +72,11 @@ class CategoryController extends \App\Http\Controllers\Controller
     {
         $category = $this->category->deleteCategory($id);
         if ($category) {
-            return response()->json([
-                'message' => trans('message.successDeletedcategory')
-            ], 200);
+            return $this->returnSuccessResponse(200,
+                trans('message.successDeletedcategory')
+            );
         }
-        return response()->json(['message' => trans('message.errorDeletecategory')], 500);
+        return $this->returnErrorResponse(400, trans('message.errorDeletecategory'));
 
 
     }

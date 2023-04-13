@@ -3,12 +3,15 @@
 namespace App\Repositories;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Traits\CategoryTrait;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryRepository
 {
     protected $category = null;
+    use CategoryTrait;
+
 
 
     //listing
@@ -21,11 +24,16 @@ class CategoryRepository
 //                                        ->get();
     }
 
-    public function create(array $data)
+    public function create(Request $request)
     {
         $category = new Category();
-        $category->title = $data['title'];
-        $category->description = $data['description'];
+        $data = $this->getFillderRequest($request);
+        $fillable = $category->getFillable();
+        foreach ($fillable as $field) {
+            if (isset($data[$field])) {
+                $category->{$field} = $data[$field];
+            }
+        }
         $category->save();
         return $category;
     }
@@ -45,35 +53,25 @@ class CategoryRepository
 
     }
 
-    public function UpdateCategory(CategoryRequest $request, $id)
+    public function UpdateCategory(Request $request, $id)
     {
-
-        $validated = $request->validated();
-        try {
-            $category = Category::find($id);
-            $category->title = $request->title;
-            $category->description = $request->description;
-            $category->save();
-
-            return response()->json([
-                'category' => $category
-            ], 201);}
-        catch
-            (\Exception $e) {
-                return response()->json(['message' => "error",], 500);
+        $category = Category::find($id);
+        $data = $this->getFillderRequest($request);
+        $fillable = $category->getFillable();
+        foreach ($fillable as $field) {
+            if (isset($data[$field])) {
+                $category->{$field} = $data[$field];
             }
+        }
+        $category->save();
+        return $category;
 
     }
 
     public function deleteCategory($id)
     {
-        try {
-            $category = Category::find($id)->delete();
-            return response()->json([
-                'category' => $category
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
-        }
+
+        $category = Category::find($id)->delete();
+        return $category;
     }
 }

@@ -5,14 +5,19 @@ namespace App\Http\Controllers\Web\Ad;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
+use App\Http\Traits\CategoryTrait;
+use App\Http\Traits\GlobalTrait;
 use App\Repositories\AdRepository;
 use Exception;
 use Illuminate\Http\Request;
+
 
 class AdController extends Controller
 {
     protected $adRepository;
     use AdTrait;
+    use CategoryTrait;
+    use GlobalTrait;
 
     public function __construct(AdRepository $adRepository)
     {
@@ -23,9 +28,10 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->all();
-            return response()->json(['data' => $ads], 200);
+            return $this->returnSuccessResponse(200, ['data' => $ads]);
+
         } catch (Exception $exception) {
-            return response()->json(['message' => trans('message.errorListAds')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorListAds'));
         }
     }
 
@@ -34,30 +40,27 @@ class AdController extends Controller
     {
         try {
             $ad = $this->adRepository->create($this->getFillerRequest($request));
-            return response()->json([
-                'data' => $ad,
-            ], 201);
+            return $this->returnSuccessResponse(201, ['data' => $ad]);
+
         } catch (Exception $exception) {
-            return response()->json(['message' => trans('message.errorCreateAd')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorCreateAd'));
+
         }
     }
 
     public function show($id)
     {
-        $ad = $this->adRepository->getAdById($id);
 
         try {
+            $ad = $this->adRepository->getAdById($id);
             if (!$ad) {
-                return response()->json([
-                    'message' => trans('message.adNotFound')],
-                    404);
-
+                return $this->returnErrorResponse(404, trans('message.adNotFound'));
             }
-            return response()->json([
-                'data' => $ad
-            ], 200);
+            return $this->returnSuccessResponse(200, ['data' => $ad]);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => trans('message.errorfindAd')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorfindAd'));
+
         }
 
     }
@@ -66,11 +69,12 @@ class AdController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $ad = $this->adRepository->update($request, $id);
-            return response()->json(['data' => $ad],
-                201);
+            $ad = $this->adRepository->update($this->getFillerRequest($request), $id);
+            return $this->returnSuccessResponse(201, ['data' => $ad]);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => trans('message.errorUpdateAd')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorUpdateAd'));
+
         }
     }
 
@@ -78,11 +82,12 @@ class AdController extends Controller
     {
         try {
             $ad = $this->adRepository->delete($id);
-            return response()->json([
-                'message' => trans('message.adDeleted')
-            ], 200);
+            return $this->returnSuccessResponse(200,
+                trans('message.adDeleted')
+            );
         } catch (\Exception $e) {
-            return response()->json(['message' => trans('message.errorDeleteAd')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorDeleteAd'));
+
         }
 
     }
@@ -91,11 +96,12 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->getAdsByDate($date);
-            return response()->json([
-                'data' => $ads
-            ], 200);
+            return $this->returnSuccessResponse(200, ['data' => $ads]);
+
         } catch (\Exception $e) {
-            return response()->json(['message'=>trans('message.adNotFoundForDate')], 500);
+
+            return $this->returnErrorResponse(400, trans('message.adNotFoundForDate'));
+
         }
     }
 
@@ -104,11 +110,11 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->getAdsByCategory($categoryId);
-            return response()->json([
-                'ad' => $ads
-            ], 200);
+            return $this->returnSuccessResponse(200, ['data' => $ads]);
+
         } catch (\Exception $e) {
-            return response()->json(['message'=>trans('message.adNotFoundForCategory')], 500);
+            return $this->returnErrorResponse(400, trans('message.adNotFoundForCategory'));
+
         }
     }
 }

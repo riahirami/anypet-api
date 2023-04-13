@@ -16,9 +16,9 @@ return [
 
     'errorListAds' => 'Problem occured while listing ads',
     'errorfindAd' => 'Problem occured, no ad founded',
-    'errorCreateAd' => 'Problem occured while creating ads',
-    'errorUpdateAd' => 'Problem occured while updating ads',
-    'errorDeleteAd' => 'Problem occured while deleting ads',
+    'errorCreateAd' => 'Problem occured while creating ad',
+    'errorUpdateAd' => 'Problem occured while updating ad',
+    'errorDeleteAd' => 'Problem occured while deleting ad',
 
     'adNotFound' => 'no ad found',
     'adUpdated' => 'ad updated successfully',
