@@ -23,9 +23,9 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->all();
-            return response()->json(['data' => $ads,], 200);
+            return response()->json(['data' => $ads], 200);
         } catch (Exception $exception) {
-            return response()->json(['message' => trans('message.errorShowAllAds')], 500);
+            return response()->json(['message' => trans('message.errorListAds')], 500);
         }
     }
 
@@ -55,7 +55,7 @@ class AdController extends Controller
             }
             return response()->json([
                 'data' => $ad
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => trans('message.errorfindAd')], 500);
         }
@@ -79,7 +79,7 @@ class AdController extends Controller
         try {
             $ad = $this->adRepository->delete($id);
             return response()->json([
-                'data' => $ad
+                'message' => trans('message.adDeleted')
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => trans('message.errorDeleteAd')], 500);

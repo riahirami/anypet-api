@@ -73,7 +73,7 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->deleteCategory($id);
         if ($category) {
             return response()->json([
-                'data' => $category,
+                'message' => trans('message.successDeletedcategory')
             ], 200);
         }
         return response()->json(['message' => trans('message.errorDeletecategory')], 500);
