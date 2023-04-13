@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Web\Ad;
+
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
@@ -22,7 +23,7 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->all();
-            return response()->json(['ads' => $ads,], 200);
+            return response()->json(['data' => $ads,], 200);
         } catch (Exception $exception) {
             return response()->json(['message' => trans('message.errorShowAllAds')], 500);
         }
@@ -34,7 +35,7 @@ class AdController extends Controller
         try {
             $ad = $this->adRepository->create($this->getFillerRequest($request));
             return response()->json([
-                'ad' => $ad,
+                'data' => $ad,
             ], 201);
         } catch (Exception $exception) {
             return response()->json(['message' => trans('message.errorCreateAd')], 500);
@@ -48,12 +49,12 @@ class AdController extends Controller
         try {
             if (!$ad) {
                 return response()->json([
-                    'message' => "no ad found",
-                ], 500);
+                    'message' => trans('message.adNotFound')],
+                    404);
 
             }
             return response()->json([
-                'ad' => $ad
+                'data' => $ad
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => trans('message.errorfindAd')], 500);
@@ -66,10 +67,8 @@ class AdController extends Controller
     {
         try {
             $ad = $this->adRepository->update($request, $id);
-            return response()->json([
-                'message' => 'ad updated successfully',
-                'ad' => $ad
-            ], 201);
+            return response()->json(['data' => $ad],
+                201);
         } catch (\Exception $e) {
             return response()->json(['message' => trans('message.errorUpdateAd')], 500);
         }
@@ -80,10 +79,8 @@ class AdController extends Controller
         try {
             $ad = $this->adRepository->delete($id);
             return response()->json([
-                'message' => 'ad deleted successfully',
-
-                'ad' => $ad
-            ], 201);
+                'data' => $ad
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => trans('message.errorDeleteAd')], 500);
         }
@@ -95,19 +92,23 @@ class AdController extends Controller
         try {
             $ads = $this->adRepository->getAdsByDate($date);
             return response()->json([
-                'ads' => $ads
+                'data' => $ads
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => "no data found for this date",], 500);
+            return response()->json(['message'=>trans('message.adNotFoundForDate')], 500);
         }
     }
 
     public
     function getByCategory($categoryId)
     {
-        $ads = $this->adRepository->getAdsByCategory($categoryId);
-        return response()->json([
-            'ad' => $ads
-        ], 200);
+        try {
+            $ads = $this->adRepository->getAdsByCategory($categoryId);
+            return response()->json([
+                'ad' => $ads
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message'=>trans('message.adNotFoundForCategory')], 500);
+        }
     }
 }

@@ -27,4 +27,11 @@ return [
     'errorDeletecategory' => 'Problem occured while deleting category',
 
 
+    'adNotFound' => 'no ad found',
+    'adUpdated' => 'ad updated successfully',
+    'adNotFoundForDate' => 'no data found for this date',
+    'adNotFoundForCategory' => 'no ad correspond for this category',
+
+
+
 ];

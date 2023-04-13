@@ -32,10 +32,8 @@ class CategoryController extends \App\Http\Controllers\Controller
     public function store(CategoryRequest $request)
     {
         try {
-            $validated = $request->validated();
-
             $category = $this->category->create($this->getFillderRequest($request));
-            return response()->json(['category' => $category], 201);
+            return response()->json(['data' => $category], 201);
 
         } catch (Exception $exception) {
             return response()->json(['message' => trans('message.errorCreateCategory')], 500);
@@ -47,7 +45,6 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->getCategoryById($id);
 
         try {
-
             return response()->json([
                 'data' => $category
             ], 200);
@@ -60,12 +57,10 @@ class CategoryController extends \App\Http\Controllers\Controller
     public
     function update(CategoryRequest $request, $id)
     {
-        $validated = $request->validated();
-
         $category = $this->category->UpdateCategory($request, $id);
         if ($category) {
             return response()->json([
-                'category' => $category,
+                'data' => $category,
             ], 201);
         }
         return response()->json(['message' => trans('message.errorUpdatecategory')], 500);
@@ -78,7 +73,7 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->deleteCategory($id);
         if ($category) {
             return response()->json([
-                'category' => $category,
+                'data' => $category,
             ], 200);
         }
         return response()->json(['message' => trans('message.errorDeletecategory')], 500);
