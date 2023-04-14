@@ -11,7 +11,6 @@ use App\Repositories\AdRepository;
 use Exception;
 use Illuminate\Http\Request;
 
-
 class AdController extends Controller
 {
     protected $adRepository;
@@ -24,11 +23,11 @@ class AdController extends Controller
         $this->adRepository = $adRepository;
     }
 
-    public function index()
+    public function index(array $data = [])
     {
+            $ads = $this->adRepository->index($data);
         try {
-            $ads = $this->adRepository->all();
-            return $this->returnSuccessResponse(200,$ads);
+            return $this->returnSuccessResponse(200, $ads);
 
         } catch (Exception $exception) {
             return $this->returnErrorResponse(400, trans('message.errorListAds'));
@@ -39,11 +38,11 @@ class AdController extends Controller
     {
 
         try {
-            $ad = $this->adRepository->getAdById($id);
+            $ad = $this->adRepository->show($id);
             if (!$ad) {
                 return $this->returnErrorResponse(404, trans('message.adNotFound'));
             }
-            return $this->returnSuccessResponse(200,['data'=>$ad]);
+            return $this->returnSuccessResponse(200, ['data' => $ad]);
 
         } catch (\Exception $e) {
             return $this->returnErrorResponse(400, trans('message.errorfindAd'));
@@ -51,11 +50,13 @@ class AdController extends Controller
         }
 
     }
+
     public function store(Request $request)
     {
         try {
-            $ad = $this->adRepository->create($request);
-            return $this->returnSuccessResponse(201,  ['data'=>$ad]);
+            $attribute = $this->getFillerRequest($request);
+            $ad = $this->adRepository->create($attribute);
+            return $this->returnSuccessResponse(201, ['data' => $ad]);
 
         } catch (Exception $exception) {
             return $this->returnErrorResponse(400, trans('message.errorCreateAd'));
@@ -66,8 +67,9 @@ class AdController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $ad = $this->adRepository->update($this->getFillerRequest($request), $id);
-            return $this->returnSuccessResponse(201,['data'=>$ad]);
+            $attribute = $this->getFillerRequest($request);
+            $ad = $this->adRepository->update($attribute, $id);
+            return $this->returnSuccessResponse(201, ['data' => $ad]);
 
         } catch (\Exception $e) {
             return $this->returnErrorResponse(400, trans('message.errorUpdateAd'));
@@ -93,7 +95,7 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->getAdsByDate($date);
-            return $this->returnSuccessResponse(200, ['data'=>$ads]);
+            return $this->returnSuccessResponse(200, ['data' => $ads]);
 
         } catch (\Exception $e) {
 
@@ -107,7 +109,7 @@ class AdController extends Controller
     {
         try {
             $ads = $this->adRepository->getAdsByCategory($categoryId);
-            return $this->returnSuccessResponse(200, ['data'=>$ads]);
+            return $this->returnSuccessResponse(200, ['data' => $ads]);
 
         } catch (\Exception $e) {
             return $this->returnErrorResponse(400, trans('message.adNotFoundForCategory'));

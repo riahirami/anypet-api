@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Ad;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Traits\GlobalTrait;
 use App\Repositories\CategoryRepository;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Traits\CategoryTrait;
@@ -22,10 +23,10 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
-    public function index()
+    public function index(array $data = [])
     {
         try {
-            $category = $this->category->getAllCategories();
+            $category = $this->category->index($data);
             return $this->returnSuccessResponse(200, $category);
         } catch (Exception $exception) {
             return $this->returnErrorResponse(400, trans('message.errorShowAllCategory'));
@@ -34,10 +35,10 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     public function show($id)
     {
-        $category = $this->category->getCategoryById($id);
+        $category = $this->category->show($id);
 
         try {
-            return $this->returnSuccessResponse(200,$category);
+            return $this->returnSuccessResponse(200,['data'=>$category]);
 
         } catch (\Exception $e) {
             return $this->returnErrorResponse(400, trans('message.errorfindCategory'));
@@ -45,10 +46,11 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
-    public function store(CategoryRequest $request)
+    public function store(Request $request)
     {
         try {
-            $category = $this->category->create($request);
+            $attribute = $this->getFillderRequest($request);
+            $category = $this->category->create($attribute);
             return $this->returnSuccessResponse(201, ['data'=>$category]);
 
         } catch (Exception $exception) {
@@ -57,10 +59,11 @@ class CategoryController extends \App\Http\Controllers\Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         try {
-            $category = $this->category->UpdateCategory( $this->getFillderRequest($request), $id);
+            $attribute = $this->getFillderRequest($request);
+            $category = $this->category->Update( $attribute, $id);
             return $this->returnSuccessResponse(201, ['data'=>$category]);
         } catch (Exception $exception) {
             return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
@@ -70,7 +73,7 @@ class CategoryController extends \App\Http\Controllers\Controller
     public
     function destroy($id)
     {
-        $category = $this->category->deleteCategory($id);
+        $category = $this->category->delete($id);
         if ($category) {
             return $this->returnSuccessResponse(200,
                 trans('message.successDeletedcategory')

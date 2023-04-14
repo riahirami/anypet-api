@@ -12,34 +12,10 @@ trait CategoryTrait
 
     public function getFillderRequest(Request $request)
     {
-        $category = new Category();
-        $fillable = $category->getFillable();
-        $adData = [];
-        foreach ($fillable as $field) {
-            if ($request->filled($field)) {
-                $adData[$field] = $request->input($field);
-            }
-        }
-        return new Request($adData);
+        return [
+            'title' => $request->title,
+            'description' => $request->description
+        ];
     }
 
-
-    public function querygetAllData($perPage = null, $orderDirection = 'asc', $orderBy = 'created_at')
-    {
-        $query = new Ad;
-
-        if ($orderDirection) {
-            $query = $query->orderBy($orderBy, $orderDirection);
-        } else {
-            $query = $query->orderBy($orderBy);
-        }
-
-        if ($perPage) {
-            $result = $query->cursorPaginate($perPage);
-        } else {
-            $result = $query->get();
-        }
-
-        return $result;
-    }
 }

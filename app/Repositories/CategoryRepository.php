@@ -15,54 +15,43 @@ class CategoryRepository
 
 
     //listing
-    public function index()
+    static function index(array $data)
     {
 //              $value = "";
 //              $categories =   Category::byTitle($value)
 //                                        ->byName($value)
 //                                        ->byDate($value)
 //                                        ->get();
+        $perPage = $data['perpage'] ?? config('constant.per_page');
+        $orderBy = $data['orderBy'] ?? config('constant.orderBy');
+        $orderDirection = $data['order_direction'] ?? config('constant.orderDirection');
+        $page = $data['page'] ?? config('constant.page');
+
+        return Category::query()
+            ->orderBy($orderBy, $orderDirection)
+            ->paginate($perPage, ['*'], $page);
     }
 
-    public function create(CategoryRequest $request)
+    function create(array $data)
     {
         $category = new Category();
-        $data = $this->getFillderRequest($request);
-        $fillable = $category->getFillable();
-        foreach ($fillable as $field) {
-            if (isset($data[$field])) {
-                $category->{$field} = $data[$field];
-            }
-        }
+        $category->title = $data['title'];
+        $category->description = $data['description'];
         $category->save();
         return $category;
     }
 
-    public function UpdateCategory(Request $request, $id)
+    public function Update(array $data, $id)
     {
         $category = Category::find($id);
-        $data = $this->getFillderRequest($request);
-        $fillable = $category->getFillable();
-        foreach ($fillable as $field) {
-            if (isset($data[$field])) {
-                $category->{$field} = $data[$field];
-            }
-        }
+        $category->title = $data['title'];
+        $category->description = $data['description'];
         $category->save();
         return $category;
 
     }
 
-    public function getAllCategories()
-    {
-//        $category = Category::orderBy('title')->cursorPaginate(10);
-//        return $category;
-
-        $category = $this->querygetAllData(config('constant.cursorPaginate'), config('constant.orderDirection'), config('constant.orderBy'));
-        return $category;
-    }
-
-    public function getCategoryById($id)
+    public function show($id)
     {
         $category = Category::find($id);
         return $category;
@@ -72,7 +61,7 @@ class CategoryRepository
 
 
 
-    public function deleteCategory($id)
+    public function delete($id)
     {
 
         $category = Category::find($id)->delete();
