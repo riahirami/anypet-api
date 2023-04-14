@@ -16,7 +16,7 @@ class AdRepository
 
     public function all()
     {
-        $ads = $this->queryData(config('constant.cursorPaginate'), 'asc', 'created_at');
+        $ads = $this->querygetAllAdData(config('constant.cursorPaginate'), config('constant.orderDirection'), config('constant.orderBy'));
         return $ads;
 
     }
@@ -31,7 +31,6 @@ class AdRepository
 
     public function create(Request $request)
     {
-
 //        $ad = new Ad();
 //        $ad->title = $data['title'];
 //        $ad->description = $data['description'];
@@ -67,8 +66,6 @@ class AdRepository
         }
         $ad->save();
         return $ad;
-
-
     }
 
     public function delete($id)

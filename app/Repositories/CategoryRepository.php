@@ -24,7 +24,7 @@ class CategoryRepository
 //                                        ->get();
     }
 
-    public function create(Request $request)
+    public function create(CategoryRequest $request)
     {
         $category = new Category();
         $data = $this->getFillderRequest($request);
@@ -36,21 +36,6 @@ class CategoryRepository
         }
         $category->save();
         return $category;
-    }
-
-    public function getAllCategories()
-    {
-        $category = Category::orderBy('title')->cursorPaginate(10);
-        return $category;
-
-    }
-
-    public function getCategoryById($id)
-    {
-        $category = Category::find($id);
-        return $category;
-
-
     }
 
     public function UpdateCategory(Request $request, $id)
@@ -67,6 +52,25 @@ class CategoryRepository
         return $category;
 
     }
+
+    public function getAllCategories()
+    {
+//        $category = Category::orderBy('title')->cursorPaginate(10);
+//        return $category;
+
+        $category = $this->querygetAllData(config('constant.cursorPaginate'), config('constant.orderDirection'), config('constant.orderBy'));
+        return $category;
+    }
+
+    public function getCategoryById($id)
+    {
+        $category = Category::find($id);
+        return $category;
+
+
+    }
+
+
 
     public function deleteCategory($id)
     {

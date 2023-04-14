@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Ad;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AdRequest extends FormRequest
 {

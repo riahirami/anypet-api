@@ -18,7 +18,7 @@ trait GlobalTrait
      */
     public function returnSuccessResponse($successCode, $data = null, $message = null): JsonResponse
     {
-        $responseData = $data ? ['data' => $data] : ['message' => $message];
+        $responseData = $data ? $data : ['message' => $message];
         return response()->json($responseData, $successCode);
     }
 

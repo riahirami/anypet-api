@@ -26,20 +26,9 @@ class CategoryController extends \App\Http\Controllers\Controller
     {
         try {
             $category = $this->category->getAllCategories();
-            return $this->returnSuccessResponse(200, ['data' => $category]);
+            return $this->returnSuccessResponse(200, $category);
         } catch (Exception $exception) {
             return $this->returnErrorResponse(400, trans('message.errorShowAllCategory'));
-        }
-    }
-
-    public function store(Request $request)
-    {
-        try {
-            $category = $this->category->create($this->getFillderRequest($request));
-            return $this->returnSuccessResponse(201, ['data' => $category]);
-
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorCreateCategory'));
         }
     }
 
@@ -48,7 +37,7 @@ class CategoryController extends \App\Http\Controllers\Controller
         $category = $this->category->getCategoryById($id);
 
         try {
-            return $this->returnSuccessResponse(200, ['data' => $category]);
+            return $this->returnSuccessResponse(200,$category);
 
         } catch (\Exception $e) {
             return $this->returnErrorResponse(400, trans('message.errorfindCategory'));
@@ -56,15 +45,26 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
+    public function store(CategoryRequest $request)
+    {
+        try {
+            $category = $this->category->create($request);
+            return $this->returnSuccessResponse(201, ['data'=>$category]);
+
+        } catch (Exception $exception) {
+            return $this->returnErrorResponse(400, trans('message.errorCreateCategory'));
+        }
+    }
+
+
     public function update(Request $request, $id)
     {
-        $category = $this->category->UpdateCategory($request, $id);
-        if ($category) {
-            return $this->returnSuccessResponse(201, ['data' => $category]);
-
+        try {
+            $category = $this->category->UpdateCategory( $this->getFillderRequest($request), $id);
+            return $this->returnSuccessResponse(201, ['data'=>$category]);
+        } catch (Exception $exception) {
+            return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
         }
-        return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
-
     }
 
     public

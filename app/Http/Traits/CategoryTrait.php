@@ -24,7 +24,7 @@ trait CategoryTrait
     }
 
 
-    public function queryData($perPage = null, $orderDirection = 'asc', $orderBy = 'created_at')
+    public function querygetAllData($perPage = null, $orderDirection = 'asc', $orderBy = 'created_at')
     {
         $query = new Ad;
 

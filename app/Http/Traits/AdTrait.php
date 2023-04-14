@@ -31,4 +31,23 @@ trait AdTrait
         }
         return new Request($adData);
     }
+
+    public function querygetAllAdData($perPage = null, $orderDirection = 'asc', $orderBy = 'created_at')
+    {
+        $query = new Ad;
+
+        if ($orderDirection) {
+            $query = $query->orderBy($orderBy, $orderDirection);
+        } else {
+            $query = $query->orderBy($orderBy);
+        }
+
+        if ($perPage) {
+            $result = $query->cursorPaginate($perPage);
+        } else {
+            $result = $query->get();
+        }
+
+        return $result;
+    }
 }
