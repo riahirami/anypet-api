@@ -3,25 +3,36 @@
 namespace App\Repositories;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Traits\CategoryTrait;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryRepository
 {
     protected $category = null;
+    use CategoryTrait;
+
 
 
     //listing
-    public function index()
+    static function index(array $data)
     {
 //              $value = "";
 //              $categories =   Category::byTitle($value)
 //                                        ->byName($value)
 //                                        ->byDate($value)
 //                                        ->get();
+        $perPage = $data['perpage'] ?? config('constant.per_page');
+        $orderBy = $data['orderBy'] ?? config('constant.orderBy');
+        $orderDirection = $data['order_direction'] ?? config('constant.orderDirection');
+        $page = $data['page'] ?? config('constant.page');
+
+        return Category::query()
+            ->orderBy($orderBy, $orderDirection)
+            ->paginate($perPage, ['*'], $page);
     }
 
-    public function create(array $data)
+    function create(array $data)
     {
         $category = new Category();
         $category->title = $data['title'];
@@ -30,36 +41,29 @@ class CategoryRepository
         return $category;
     }
 
-    public function getAllCategories()
-    {
-        $category = Category::All();
-        return $category;
-
-    }
-
-    public function getCategoryById($id)
+    public function Update(array $data, $id)
     {
         $category = Category::find($id);
-        return $category;
-
-
-    }
-
-    public function UpdateCategory(CategoryRequest $request, $id)
-    {
-
-        $validated = $request->validated();
-
-        $category = Category::find($id);
-        $category->title = $request->title;
-        $category->description = $request->description;
+        $category->title = $data['title'];
+        $category->description = $data['description'];
         $category->save();
-
         return $category;
+
     }
 
-    public function deleteCategory($id)
+    public function show($id)
     {
+        $category = Category::find($id);
+        return $category;
+
+
+    }
+
+
+
+    public function delete($id)
+    {
+
         $category = Category::find($id)->delete();
         return $category;
     }

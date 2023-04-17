@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Web\Ad;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Traits\GlobalTrait;
 use App\Repositories\CategoryRepository;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Traits\CategoryTrait;
@@ -12,6 +14,8 @@ class CategoryController extends \App\Http\Controllers\Controller
 {
     private $category;
     use CategoryTrait;
+    use GlobalTrait;
+
 
     public function __construct(CategoryRepository $category)
     {
@@ -19,75 +23,63 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
-    public function index()
-    {
-        $category = $this->category->getAllCategories();
-        if($category) {
-            return response()->json(['data' => $category,], 200);
-        }
-        return  response()->json(['message' => "no data found !",], 500);
-    }
-
-    public function store(CategoryRequest $request)
+    public function index(array $data = [])
     {
         try {
-            $validated = $request->validated();
-
-            $category = $this->category->create($this->getFillderRequest($request));
-            return response()->json(['category' => $category], 201);
-
+            $category = $this->category->index($data);
+            return $this->returnSuccessResponse(200, $category);
         } catch (Exception $exception) {
-            return response()->json(['message' => __('message.error')], 500);
+            return $this->returnErrorResponse(400, trans('message.errorShowAllCategory'));
         }
     }
 
     public function show($id)
     {
-        $category = $this->category->getCategoryById($id);
+        $category = $this->category->show($id);
 
         try {
-            if (!$category) {
-                return response()->json([
-                    'message' => "no category found",
-                ], 500);
+            return $this->returnSuccessResponse(200,['data'=>$category]);
 
-            }
-            return response()->json([
-                'results' => $category
-            ], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => "error",], 500);
+            return $this->returnErrorResponse(400, trans('message.errorfindCategory'));
         }
 
     }
 
-    public
-    function update(CategoryRequest $request, $id)
+    public function store(Request $request)
     {
-        $validated = $request->validated();
+        try {
+            $attribute = $this->getFillderRequest($request);
+            $category = $this->category->create($attribute);
+            return $this->returnSuccessResponse(201, ['data'=>$category]);
 
-        $category = $this->category->UpdateCategory($request, $id);
-        if ($category) {
-            return response()->json([
-                'message' => 'category updated successfully',
-                'category' => $category,
-            ]);
+        } catch (Exception $exception) {
+            return $this->returnErrorResponse(400, trans('message.errorCreateCategory'));
         }
-        return response()->json(['message' => "error",], 500);
+    }
 
+
+    public function update(CategoryRequest $request, $id)
+    {
+        try {
+            $attribute = $this->getFillderRequest($request);
+            $category = $this->category->Update( $attribute, $id);
+            return $this->returnSuccessResponse(201, ['data'=>$category]);
+        } catch (Exception $exception) {
+            return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
+        }
     }
 
     public
     function destroy($id)
     {
-        $category = $this->category->deleteCategory($id);
+        $category = $this->category->delete($id);
         if ($category) {
-            return response()->json([
-                'message' => 'category deleted successfully',
-                'category' => $category,
-            ]);
+            return $this->returnSuccessResponse(200,
+                trans('message.successDeletedcategory')
+            );
         }
-        return response()->json(['message' => "error",], 500);
+        return $this->returnErrorResponse(400, trans('message.errorDeletecategory'));
 
 
     }

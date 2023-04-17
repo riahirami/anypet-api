@@ -1,12 +1,21 @@
 <?php
-namespace App\Http\Traits;
-use Illuminate\Http\Request;
-Trait CategoryTrait{
 
- public function   getFillderRequest(Request $request){
+namespace App\Http\Traits;
+
+use App\Http\Requests\CategoryRequest;
+use App\Models\Ad;
+use App\Models\Category;
+use Illuminate\Http\Request;
+
+trait CategoryTrait
+{
+
+    public function getFillderRequest(Request $request)
+    {
         return [
-            'title'=>$request->title,
-            'description'=> $request->description
+            'title' => $request->title,
+            'description' => $request->description
         ];
-}
+    }
+
 }
