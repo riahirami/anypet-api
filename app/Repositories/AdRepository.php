@@ -8,34 +8,31 @@ use App\Models\Ad;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Traits\CategoryTrait;
+use Illuminate\Support\Facades\Log;
 
 class AdRepository
 {
     use CategoryTrait;
     use AdTrait;
 
-    static function index(array $data)
+    /**
+     * @param array $parameters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    static function index(array $parameters)
     {
-        $perPage = $data['perpage'] ?? config('constant.per_page');
-        $orderBy = $data['orderBy'] ?? config('constant.orderBy');
-        $orderDirection = $data['order_direction'] ?? config('constant.orderDirection');
-        $page = $data['page'] ?? config('constant.page');
-
         return Ad::query()
-            ->orderBy($orderBy, $orderDirection)
-            ->paginate($perPage, ['*'], $page);
-
-// $ads = $this->querygetAllAdData(config('constant.cursorPaginate'), config('constant.orderDirection'), config('constant.orderBy'));
-
+            ->byKeyword($parameters['keyword'])
+            ->byStatus($parameters['status'])
+            ->byDate($parameters['date'])
+            ->orderBy($parameters['orderBy'], $parameters['orderDirection'])
+            ->paginate($parameters['perPage'], ['*'], null, $parameters['page']);
     }
 
     public
     function show($id)
     {
-        $ad = Ad::find($id);
-        return $ad;
-
-
+        return Ad::findOrFail($id);
     }
 
     public
@@ -45,12 +42,12 @@ class AdRepository
         $ad->title = $data['title'];
         $ad->description = $data['description'];
         $ad->country = $data['country'];
-        $ad->status = 0;
         $ad->state = $data['state'];
         $ad->city = $data['city'];
         $ad->street = $data['street'];
         $ad->postal_code = $data['postal_code'];
         $ad->category_id = $data['category_id'];
+        $ad->status = 0;
         $ad->save();
         return $ad;
     }
@@ -61,7 +58,6 @@ class AdRepository
         $ad = Ad::find($id);
         $ad->title = $data['title'];
         $ad->description = $data['description'];
-        $ad->status = $data['status'];
         $ad->country = $data['country'];
         $ad->state = $data['state'];
         $ad->city = $data['city'];
@@ -93,10 +89,41 @@ class AdRepository
 
     public function getAdsByCategory($categoryId)
     {
-
         $ads = Ad::byCategory($categoryId)->get();
         return $ads;
-
     }
+
+    public function getAdsByStatus($status)
+    {
+        $ads = Ad::byStatus($status)->get();
+        return $ads;
+    }
+
+    public function getAdsByString($string)
+    {
+
+        $ads = Ad::byString($string)->get();
+        return $ads;
+    }
+
+    public function updateAdStatus(array $parameters)
+    {
+        $ad = Ad::findOrFail($parameters['id']);
+        $ad->status = $parameters['status'];
+        $ad->save();
+        return $ad;
+    }
+
+    public function getStats($column){
+        $stats =Ad::AdsStats($column);
+        return $stats ;
+    }
+
+    public function CountAdsPerDate(){
+        $stats = Ad::CountAdsPerDate();
+        return $stats ;
+    }
+
 }
+
 

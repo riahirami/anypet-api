@@ -7,10 +7,14 @@ use App\Http\Requests\Auth\AuthForgotPasswordeRequest;
 use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Http\Requests\Auth\AuthRegistreRequest;
 use App\Http\Requests\Auth\AuthResetPasswordeRequest;
+use App\Http\Traits\GlobalTrait;
 use App\Repositories\AuthRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,10 +31,28 @@ class AuthController extends Controller
 {
 
     private $auth;
+    use GlobalTrait;
 
     public function __construct(AuthRepository $auth)
     {
         $this->auth = $auth;
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        try {
+            if ($request->hasFile('avatar')) {
+                $avatar = $this->auth->setAvatar($request);
+                return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $avatar]);
+            }
+            else{
+                return $this->returnSuccessResponse(Response::HTTP_BAD_REQUEST, ['message'=>'no avatar selected']);
+
+            }
+        } catch (HttpClientException $e) {
+               return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+
+        }
     }
 
     public function profile()
@@ -60,7 +82,7 @@ class AuthController extends Controller
                 'token' => $user,
                 'message' => 'ye are logged in',
 
-            ], 201);
+            ], 200);
         }
         return response()->json([
             'message' => 'error sign in',
@@ -96,7 +118,7 @@ class AuthController extends Controller
             $this->auth->logout();
             return response()->json([
                 'message' => 'Successfully logged out',
-            ], 201);
+            ], 200);
         }
         return response()->json([
             'message' => 'error',
@@ -109,7 +131,7 @@ class AuthController extends Controller
         if ($refresh) {
             return response()->json([
                 'message' => 'your session has been refreshed successfully',
-            ], 201);
+            ], 200);
         }
         return response()->json([
             'message' => 'error',
@@ -118,11 +140,11 @@ class AuthController extends Controller
 
     public function SendEmailVerification(EmailVerificationRequest $request)
     {
-        if(!$request->user()->email_verified_at) {
-        $this->auth->SendEmailVerification($request);
+        if (!$request->user()->email_verified_at) {
+            $this->auth->SendEmailVerification($request);
             return response()->json([
                 'message' => 'you are redirect by email verify link and your account is now verified',
-            ], 201);
+            ], 200);
         }
         return response()->json([
             'message' => 'error verification, try again later',
@@ -131,11 +153,11 @@ class AuthController extends Controller
 
     public function ResendEmailVerification(Request $request)
     {
-        if(!$request->user()->email_verified_at) {
-        $this->auth->ResendEmailVerification($request);
+        if (!$request->user()->email_verified_at) {
+            $this->auth->ResendEmailVerification($request);
             return response()->json([
                 'message' => 'you re email verification was resend again',
-            ], 201);
+            ], 200);
         }
         return response()->json([
             'message' => 'error ! your account is already verified',
@@ -145,12 +167,12 @@ class AuthController extends Controller
     public function forgotPassword(AuthForgotPasswordeRequest $request)
     {
         $validatedRequest = $request->validated();
-        $forgotPassword=$this->auth->forgotPassword($request);
-         if($forgotPassword){
-             return response()->json([
-                 'message' => 'reset password link has been send, check your email',
-             ], 201);
-         }
+        $forgotPassword = $this->auth->forgotPassword($request);
+        if ($forgotPassword) {
+            return response()->json([
+                'message' => 'reset password link has been send, check your email',
+            ], 200);
+        }
         return response()->json([
             'message' => 'error to send reset password link, try again later',
         ], 500);
@@ -159,9 +181,9 @@ class AuthController extends Controller
     public function reset(AuthResetPasswordeRequest $request)
     {
         $validatedRequest = $request->validated();
-        $reset= $this->auth->resetPassword($request);
+        $reset = $this->auth->resetPassword($request);
 
-        if($reset){
+        if ($reset) {
             return response()->json([
                 'message' => 'password reset successfully  ',
             ], 201);

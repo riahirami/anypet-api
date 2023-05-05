@@ -9,13 +9,15 @@ use App\Http\Traits\CategoryTrait;
 use App\Http\Traits\GlobalTrait;
 use App\Repositories\AdRepository;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class AdController extends Controller
 {
     protected $adRepository;
     use AdTrait;
-    use CategoryTrait;
     use GlobalTrait;
 
     public function __construct(AdRepository $adRepository)
@@ -23,44 +25,43 @@ class AdController extends Controller
         $this->adRepository = $adRepository;
     }
 
-    public function index(array $data = [])
+    public function index(Request $request)
     {
-            $ads = $this->adRepository->index($data);
+        $parameters = $this->getQueryParameters($request);
+            $ads = $this->adRepository->index($parameters);
         try {
-            return $this->returnSuccessResponse(200, $ads);
-
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorListAds'));
+            return $this->returnSuccessResponse(Response::HTTP_OK, $ads);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorListAds'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+
 
     public function show($id)
     {
-
         try {
             $ad = $this->adRepository->show($id);
-            if (!$ad) {
-                return $this->returnErrorResponse(404, trans('message.adNotFound'));
-            }
-            return $this->returnSuccessResponse(200, ['data' => $ad]);
-
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ad]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorfindAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(400, trans('message.errorfindAd'));
-
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
-
     }
+
 
     public function store(Request $request)
     {
         try {
             $attribute = $this->getFillerRequest($request);
             $ad = $this->adRepository->create($attribute);
-            return $this->returnSuccessResponse(201, ['data' => $ad]);
-
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorCreateAd'));
-
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorCreateAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 
@@ -69,11 +70,11 @@ class AdController extends Controller
         try {
             $attribute = $this->getFillerRequest($request);
             $ad = $this->adRepository->update($attribute, $id);
-            return $this->returnSuccessResponse(201, ['data' => $ad]);
-
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorUpdateAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(400, trans('message.errorUpdateAd'));
-
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 
@@ -81,39 +82,105 @@ class AdController extends Controller
     {
         try {
             $ad = $this->adRepository->delete($id);
-            return $this->returnSuccessResponse(200,
+            return $this->returnSuccessResponse(Response::HTTP_OK,
                 trans('message.adDeleted')
             );
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeleteAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(400, trans('message.errorDeleteAd'));
-
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
-
     }
+
 
     public function getByDate($date)
     {
         try {
             $ads = $this->adRepository->getAdsByDate($date);
-            return $this->returnSuccessResponse(200, ['data' => $ads]);
-
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.adNotFoundForDate'));
         } catch (\Exception $e) {
-
-            return $this->returnErrorResponse(404, trans('message.adNotFoundForDate'));
-
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+
 
     public
     function getByCategory($categoryId)
     {
         try {
             $ads = $this->adRepository->getAdsByCategory($categoryId);
-            return $this->returnSuccessResponse(200, ['data' => $ads]);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads]);
+
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.adNotFoundForCategory'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    public
+    function getAdsByStatus($status)
+    {
+        try {
+            $ads = $this->adRepository->getAdsByStatus($status);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads]);
 
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(400, trans('message.adNotFoundForCategory'));
+            return $this->returnErrorResponse(400, trans('message.adNotFoundForStatus'));
+        }
+    }
 
+    public function getAdsByString($string)
+    {
+        try {
+            $ads = $this->adRepository->getAdsByString($string);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(400, trans('message.adNotFoundForKey'));
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function requestAds(Request $request)
+    {
+
+        $parameters = $this->getStatusQueryParameters($request);
+
+        try {
+            $ad = $this->adRepository->updateAdStatus($parameters);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    public function getAdsStats(Request $request ){
+        $column = $request->column ;
+        try{
+            $ads = $this->adRepository->getStats($column);
+            return $this->returnSuccessResponse(Response::HTTP_OK,['data'=>$ads]);
+        }catch(ModelNotFoundException){
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND,trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    public function getCountAdsPerDate(){
+        try{
+            $stats = $this->adRepository->CountAdsPerDate();
+            return $this->returnSuccessResponse(Response::HTTP_OK,['data'=>$stats]);
+        }catch(ModelNotFoundException){
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND,trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 }

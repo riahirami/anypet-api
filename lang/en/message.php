@@ -12,7 +12,7 @@ return [
     | you want to customize your views to better match your application.
     |
     */
-    'error' => 'soory we can not complete u request this time',
+    'ERROR' => 'sorry we can not complete your request this time',
 
     'errorListAds' => 'Problem occured while listing ads',
     'errorfindAd' => 'Problem occured, no ad founded',
@@ -25,6 +25,9 @@ return [
     'adDeleted' => 'ad deleted successfully',
     'adNotFoundForDate' => 'no data found for this date',
     'adNotFoundForCategory' => 'no ad correspond for this category',
+    'adNotFoundForStatus' => 'no ads correspond for this status',
+    'adNotFoundForKey' => 'no ads correspond for this key',
+    'errorFindAd' => 'Problem when changing status has occured',
 
 
     'errorShowAllCategory' => 'Problem occured while listing categories',

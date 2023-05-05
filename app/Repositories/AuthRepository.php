@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -24,6 +25,16 @@ class AuthRepository
     {
         //        $token = Auth::login($user);
         return Auth::user();
+    }
+
+    public function setAvatar(Request $request){
+
+        $path = Storage::disk('avatars')->put("", $request->file('avatar'));
+        $imageUrl = Storage::disk('avatars')->url($path);
+        $connectedUser=User::findOrFail(Auth::id());
+        $connectedUser->avatar=$imageUrl;
+        $connectedUser->save();
+        return $imageUrl;
     }
 
     public function login(AuthLoginRequest $request)
@@ -45,7 +56,7 @@ class AuthRepository
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'avatar' => $request->avatar,
+                'avatar' => "default avatar",
             ]);
             event(new Registered($user));
             return $user;
