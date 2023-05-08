@@ -28,7 +28,7 @@ class AuthRegistreRequest extends FormRequest
             'password' => 'required|string|min:5',
             'phone' => 'required|string|min:8|max:255',
             'address' => 'required|string|max:255',
-            'avatar' => 'required|string|max:255',
+            'avatar' => 'nullable|string|max:255',
         ];
     }
 }

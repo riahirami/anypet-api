@@ -13,7 +13,7 @@ class Category extends Model
     const ACTIVE = 1;
      const INACTIVE = 0;
 
-    protected $fillable = ['title', 'description', 'status'];
+    protected $fillable = ['title', 'description'];
 
     public function ads(): HasMany
     {

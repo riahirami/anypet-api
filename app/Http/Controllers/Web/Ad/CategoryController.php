@@ -6,9 +6,11 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Traits\GlobalTrait;
 use App\Repositories\CategoryRepository;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Traits\CategoryTrait;
+use Illuminate\Http\Response;
 
 class CategoryController extends \App\Http\Controllers\Controller
 {
@@ -23,64 +25,78 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
-    public function index(array $data = [])
+    public function index(Request $request)
     {
         try {
-            $category = $this->category->index($data);
-            return $this->returnSuccessResponse(200, $category);
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorShowAllCategory'));
+            $category = $this->category->index([
+                'perpage' => $request->perpage,
+                'orderBy' => $request->orderBy,
+                'order_direction' => $request->order_direction,
+                'page' => 'page',
+            ]);
+            return $this->returnSuccessResponse(Response::HTTP_OK, $category);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorShowAllCategory'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 
     public function show($id)
     {
         $category = $this->category->show($id);
-
         try {
-            return $this->returnSuccessResponse(200,['data'=>$category]);
-
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $category]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorfindCategory'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(400, trans('message.errorfindCategory'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
-
     }
+
+
 
     public function store(Request $request)
     {
         try {
             $attribute = $this->getFillderRequest($request);
             $category = $this->category->create($attribute);
-            return $this->returnSuccessResponse(201, ['data'=>$category]);
-
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorCreateCategory'));
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $category]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorCreateCategory'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 
 
-    public function update(CategoryRequest $request, $id)
+    public function update(Request $request, $id)
     {
         try {
             $attribute = $this->getFillderRequest($request);
-            $category = $this->category->Update( $attribute, $id);
-            return $this->returnSuccessResponse(201, ['data'=>$category]);
-        } catch (Exception $exception) {
-            return $this->returnErrorResponse(400, trans('message.errorUpdatecategory'));
+            $category = $this->category->Update($attribute, $id);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $category]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorUpdatecategory'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+
 
     public
     function destroy($id)
     {
-        $category = $this->category->delete($id);
-        if ($category) {
-            return $this->returnSuccessResponse(200,
+        try {
+            $category = $this->category->delete($id);
+            return $this->returnSuccessResponse(Response::HTTP_OK,
                 trans('message.successDeletedcategory')
             );
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeletecategory'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
-        return $this->returnErrorResponse(400, trans('message.errorDeletecategory'));
-
 
     }
 }

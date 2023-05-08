@@ -22,11 +22,10 @@ class CategoryRepository
 //                                        ->byName($value)
 //                                        ->byDate($value)
 //                                        ->get();
-        $perPage = $data['perpage'] ?? config('constant.per_page');
-        $orderBy = $data['orderBy'] ?? config('constant.orderBy');
-        $orderDirection = $data['order_direction'] ?? config('constant.orderDirection');
-        $page = $data['page'] ?? config('constant.page');
-
+        $perPage = $data['perpage'] ?? config('constants.PER_PAGE');
+        $orderBy = $data['orderBy'] ?? config('constants.ORDER_BY');
+        $orderDirection = $data['order_direction'] ?? config('constants.ORDER_DIRECTION');
+        $page = $data['page'] ?? config('constants.PAGE');
         return Category::query()
             ->orderBy($orderBy, $orderDirection)
             ->paginate($perPage, ['*'], $page);

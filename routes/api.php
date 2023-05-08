@@ -32,5 +32,6 @@ Route::get('email/verify/{id}/{hash}', [AuthController::class,'SendEmailVerifica
 Route::post('email/resend-verification', [AuthController::class,'ResendEmailVerification'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'reset'])->name('password.reset');
+Route::post('avatar', [AuthController::class, 'updateAvatar'])->name('avatar');
 
 

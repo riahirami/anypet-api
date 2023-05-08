@@ -45,6 +45,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return [];
     }
 
-
+    public function scopeVerifiedEmail($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
 
 }
