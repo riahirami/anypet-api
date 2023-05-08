@@ -29,8 +29,8 @@ trait AdTrait
     {
         return [
             'perPage' => $request->input('perPage', config('constants.PER_PAGE')),
-            'orderDirection' => $request->input('orderdirection', config('constants.ORDER_DIRECTION')),
-            'orderBy' => $request->input('orderby', config('constants.ORDER_BY')),
+            'orderDirection' => $request->input('orderDirection', config('constants.ORDER_DIRECTION')),
+            'orderBy' => $request->input('orderBy', config('constants.ORDER_BY')),
             'page' => $request->input('page', config('constants.PAGE')),
             'keyword' => $request->input('keyword'),
             'status' => $request->input('status'),

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use function PHPUnit\Framework\isNull;
 
 class AdController extends Controller
 {
@@ -28,7 +29,7 @@ class AdController extends Controller
     public function index(Request $request)
     {
         $parameters = $this->getQueryParameters($request);
-            $ads = $this->adRepository->index($parameters);
+        $ads = $this->adRepository->index($parameters);
         try {
             return $this->returnSuccessResponse(Response::HTTP_OK, $ads);
         } catch (ModelNotFoundException) {
@@ -150,10 +151,24 @@ class AdController extends Controller
     {
 
         $parameters = $this->getStatusQueryParameters($request);
-
         try {
+
+//            if(isNull($parameters["id"])){
+//                return $this->returnSuccessResponse(Response::HTTP_NOT_MODIFIED, );
+//            }
             $ad = $this->adRepository->updateAdStatus($parameters);
-            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.errorUpdateAd'), 'data' => $ad]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    public function getAdsStats(Request $request)
+    {
+        $column = $request->column;
+        try {
+            $ads = $this->adRepository->getStats($column);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads]);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
         } catch (\Exception $e) {
@@ -161,24 +176,13 @@ class AdController extends Controller
         }
     }
 
-    public function getAdsStats(Request $request ){
-        $column = $request->column ;
-        try{
-            $ads = $this->adRepository->getStats($column);
-            return $this->returnSuccessResponse(Response::HTTP_OK,['data'=>$ads]);
-        }catch(ModelNotFoundException){
-            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND,trans('message.errorFindAd'));
-        } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
-        }
-    }
-
-    public function getCountAdsPerDate(){
-        try{
+    public function getCountAdsPerDate()
+    {
+        try {
             $stats = $this->adRepository->CountAdsPerDate();
-            return $this->returnSuccessResponse(Response::HTTP_OK,['data'=>$stats]);
-        }catch(ModelNotFoundException){
-            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND,trans('message.errorFindAd'));
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $stats]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
         } catch (\Exception $e) {
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
