@@ -187,4 +187,33 @@ class AdController extends Controller
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+
+    public function setFavorite($ad)
+    {
+        try {
+            $response = $this->adRepository->setToFavorite($ad);
+            $message = $response->getData()->message;
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['message' => $message]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+
+    }
+
+    public function getlistFavoriteAds()
+    {
+        $id = auth()->id();
+        try {
+            $ads = $this->adRepository->listFavoriteAds($id);
+            $count = $this->adRepository->listFavoriteAds($id)->count();
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads,
+                'count' => $count]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
 }

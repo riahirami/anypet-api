@@ -50,4 +50,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $query->whereNotNull('email_verified_at');
     }
 
+    public function favoriteAds()
+    {
+        return $this->belongsToMany(Ad::class, 'favorite_ads')->withTimestamps();
+    }
+
+
 }

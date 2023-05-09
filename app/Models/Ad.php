@@ -21,13 +21,18 @@ class Ad extends Model
         return $this->hasOne(Category::class);
     }
 
+    public function favoriteAds()
+    {
+        return $this->hasMany(FavoriteAd::class);
+    }
+
     public function scopeByDate($query, $date)
     {
         $formattedDate = date('Y-m-d', strtotime($date));
-        if(isset($date))
-         $query=$query->whereDate('created_at', $formattedDate);
+        if (isset($date))
+            $query = $query->whereDate('created_at', $formattedDate);
 
-        return $query ;
+        return $query;
     }
 
     public function scopeByCategory($query, $id)
@@ -37,15 +42,15 @@ class Ad extends Model
 
     public function scopeByStatus($query, $status)
     {
-        if(isset($status))
-        return $query->where('status', $status);
+        if (isset($status))
+            return $query->where('status', $status);
     }
 
     public function scopeByKeyword($query, $keyword)
     {
-        if(isset($keyword))
-        $query = $query->where('title', 'LIKE', '%' . $keyword . '%')
-            ->orWhere('description', 'LIKE', '%' . $keyword . '%');
+        if (isset($keyword))
+            $query = $query->where('title', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('description', 'LIKE', '%' . $keyword . '%');
         return $query;
     }
 
@@ -56,12 +61,15 @@ class Ad extends Model
             ->get();
     }
 
-    public function scopeCountAdsPerDate($query){
+    public function scopeCountAdsPerDate($query)
+    {
         return $query->select($query->raw('DATE(created_at) as date'), $query->raw('COUNT(*) as count'))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
     }
+
+
 
 
 }

@@ -6,6 +6,7 @@ use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
 use App\Models\Ad;
 use App\Models\Category;
+use App\Models\FavoriteAd;
 use Illuminate\Http\Request;
 use App\Http\Traits\CategoryTrait;
 use Illuminate\Support\Facades\Log;
@@ -114,16 +115,36 @@ class AdRepository
         return $ad;
     }
 
-    public function getStats($column){
-        $stats =Ad::AdsStats($column);
-        return $stats ;
+    public function getStats($column)
+    {
+        $stats = Ad::AdsStats($column);
+        return $stats;
     }
 
-    public function CountAdsPerDate(){
+    public function CountAdsPerDate()
+    {
         $stats = Ad::CountAdsPerDate();
-        return $stats ;
+        return $stats;
     }
 
+    public function setToFavorite($id)
+    {
+        $ad = Ad::findOrFail($id);
+        if (auth()->user()->favoriteAds()->where('ad_id', $id)->exists()) {
+            auth()->user()->favoriteAds()->detach($ad);
+            return response()->json(['message' => trans('message.successUnsetFavorite')]);
+        } else {
+            auth()->user()->favoriteAds()->attach($ad);
+            return response()->json(['message' => trans('message.successSetFavorite')]);
+        }
+
+    }
+
+    public function listFavoriteAds($id)
+    {
+        $favoriteAds = FavoriteAd::favoriteList($id)->with('ad')->get();
+        return $favoriteAds;
+    }
 }
 
 
