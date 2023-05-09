@@ -28,6 +28,8 @@ return [
     'adNotFoundForStatus' => 'no ads correspond for this status',
     'adNotFoundForKey' => 'no ads correspond for this key',
     'errorFindAd' => 'Problem when changing status has occured',
+    'successSetFavorite' => 'Ads added to favorite successffully',
+    'successUnsetFavorite' => 'Ads removed from favorite successffully',
 
 
     'errorShowAllCategory' => 'Problem occured while listing categories',
