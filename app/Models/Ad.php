@@ -26,6 +26,11 @@ class Ad extends Model
         return $this->hasMany(FavoriteAd::class);
     }
 
+    public function CommentAds()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function scopeByDate($query, $date)
     {
         $formattedDate = date('Y-m-d', strtotime($date));

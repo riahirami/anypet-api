@@ -69,15 +69,7 @@ class AdRepository
         return $ad;
     }
 
-    public
-    function delete($id)
-    {
 
-        $ad = Ad::findOrFail($id);
-        $ad->delete();
-        return $ad;
-
-    }
 
     public
     function getAdsByDate($date)
