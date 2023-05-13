@@ -10,6 +10,7 @@ Route::middleware(['auth.jwt','verified'])->group(function(){
     Route::get('/', [AdController::class, 'index'])->name('ads.index');
     Route::post('/', [AdController::class, 'store'])->name('ads.store');
     Route::get('/requestad', [AdController::class, 'requestAds'])->name('ads.requestads');
+    Route::get('/media/{ad_id}', [AdController::class, 'getMediaPerAds'])->name('ads.media');
     Route::get('/stats', [AdController::class, 'getAdsStats'])->name('ads.statsads');
     Route::get('/statsdate', [AdController::class, 'getCountAdsPerDate'])->name('ads.statsdata');
     Route::delete('/{id}', [AdController::class, 'destroy'])->name('ads.destroy');

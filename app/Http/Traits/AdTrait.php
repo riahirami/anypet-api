@@ -4,14 +4,14 @@ namespace App\Http\Traits;
 
 use App\Http\Requests\Ad\AdRequest;
 use App\Models\Ad;
+use App\Models\Media;
 use Illuminate\Http\Request;
 
 trait AdTrait
 {
     public function getFillerRequest(Request $request)
     {
-
-        return [
+        $data = [
             'title' => $request->title,
             'description' => $request->description,
             'country' => $request->country,
@@ -20,9 +20,10 @@ trait AdTrait
             'city' => $request->city,
             'street' => $request->street,
             'postal_code' => $request->postal_code,
-            'category_id' => $request->category_id
+            'category_id' => $request->category_id,
+            'media' => $request->file('media.*')
         ];
-
+        return $data;
     }
 
     public function getQueryParameters($request)

@@ -55,8 +55,9 @@ class AdController extends Controller
 
     public function store(Request $request)
     {
-        try {
             $attribute = $this->getFillerRequest($request);
+
+        try {
             $ad = $this->adRepository->create($attribute);
             return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
         } catch (ModelNotFoundException) {
@@ -93,7 +94,17 @@ class AdController extends Controller
         }
     }
 
-
+    public function getMediaPerAds($ad_id)
+    {
+        try {
+            $media = $this->adRepository->getMedia($ad_id);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $media]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.adNotFoundForDate'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
     public function getByDate($date)
     {
         try {

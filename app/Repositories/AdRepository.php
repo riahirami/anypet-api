@@ -7,6 +7,7 @@ use App\Http\Traits\AdTrait;
 use App\Models\Ad;
 use App\Models\Category;
 use App\Models\FavoriteAd;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use App\Http\Traits\CategoryTrait;
 use Illuminate\Support\Facades\Log;
@@ -36,8 +37,7 @@ class AdRepository
         return Ad::findOrFail($id);
     }
 
-    public
-    function create(array $data)
+    public function create(array $data)
     {
         $ad = new Ad();
         $ad->title = $data['title'];
@@ -50,8 +50,18 @@ class AdRepository
         $ad->category_id = $data['category_id'];
         $ad->status = 0;
         $ad->save();
+        if (isset($data['media'])) {
+            foreach ($data['media'] as $file) {
+                $media = new Media();
+                $media->file_name = $file->getClientOriginalName();
+                $media->file_path = $file->store('public/ads');
+                $media->mime_type = $file->getClientMimeType();
+                $ad->media()->save($media);
+            }
+        }
         return $ad;
     }
+
 
     public
     function update(array $data, $id)
@@ -69,7 +79,12 @@ class AdRepository
         return $ad;
     }
 
-
+    public function getMedia($ad_id)
+    {
+        $ad = Ad::findOrFail($ad_id);
+        $media = $ad->media;
+        return $media;
+    }
 
     public
     function getAdsByDate($date)
@@ -136,6 +151,12 @@ class AdRepository
     {
         $favoriteAds = FavoriteAd::favoriteList($id)->with('ad')->get();
         return $favoriteAds;
+    }
+
+    public function delete($id)
+    {
+        $ad = AD::destroy($id);
+        return $ad;
     }
 }
 

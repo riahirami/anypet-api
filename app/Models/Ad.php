@@ -16,10 +16,16 @@ class Ad extends Model
         'status' => 0,
     ];
 
+    public function media()
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
     public function category(): HasOne
     {
         return $this->hasOne(Category::class);
     }
+
 
     public function favoriteAds()
     {
@@ -73,8 +79,6 @@ class Ad extends Model
             ->orderBy('date')
             ->get();
     }
-
-
 
 
 }
