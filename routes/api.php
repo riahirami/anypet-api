@@ -35,3 +35,5 @@ Route::post('reset-password', [AuthController::class, 'reset'])->name('password.
 Route::post('avatar', [AuthController::class, 'updateAvatar'])->name('avatar');
 
 
+
+

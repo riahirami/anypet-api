@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use function PHPUnit\Framework\isNull;
 
 class AdController extends Controller
@@ -26,6 +27,10 @@ class AdController extends Controller
         $this->adRepository = $adRepository;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $parameters = $this->getQueryParameters($request);
@@ -39,7 +44,10 @@ class AdController extends Controller
         }
     }
 
-
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         try {
@@ -48,15 +56,25 @@ class AdController extends Controller
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorfindAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+//            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
-            $attribute = $this->getFillerRequest($request);
-
+        $attribute = $this->getFillerRequest($request);
+//        $validator = Validator::make($attribute, [
+//            'media' => 'required|mimes:jpeg,png,jpg,gif'
+//        ]);
+//
+//        if ($validator->fails()) {
+//            return $this->returnErrorResponse(Response::HTTP_UNPROCESSABLE_ENTITY, $validator->errors());
+//        }
         try {
             $ad = $this->adRepository->create($attribute);
             return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
@@ -67,19 +85,29 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         try {
-            $attribute = $this->getFillerRequest($request);
+            $attribute = $this->getFillerUpdateRequest($request);
             $ad = $this->adRepository->update($attribute, $id);
             return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorUpdateAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+//            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy($id)
     {
         try {
@@ -94,10 +122,12 @@ class AdController extends Controller
         }
     }
 
-    public function getMediaPerAds($ad_id)
-    {
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllMedia(){
         try {
-            $media = $this->adRepository->getMedia($ad_id);
+            $media = $this->adRepository->getAllMedia();
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $media]);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.adNotFoundForDate'));
@@ -105,6 +135,27 @@ class AdController extends Controller
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+
+    /**
+     * @param $ad_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMediaPerAds($ad_id)
+    {
+        try {
+            $media = $this->adRepository->getMediaOfAds($ad_id);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $media]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.adNotFoundForDate'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    /**
+     * @param $date
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getByDate($date)
     {
         try {
@@ -117,7 +168,10 @@ class AdController extends Controller
         }
     }
 
-
+    /**
+     * @param $categoryId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public
     function getByCategory($categoryId)
     {
@@ -132,6 +186,10 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @param $status
+     * @return \Illuminate\Http\JsonResponse
+     */
     public
     function getAdsByStatus($status)
     {
@@ -144,6 +202,10 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @param $string
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAdsByString($string)
     {
         try {
@@ -174,6 +236,10 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAdsStats(Request $request)
     {
         $column = $request->column;
@@ -187,6 +253,9 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getCountAdsPerDate()
     {
         try {
@@ -199,6 +268,10 @@ class AdController extends Controller
         }
     }
 
+    /**
+     * @param $ad
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function setFavorite($ad)
     {
         try {
@@ -213,6 +286,28 @@ class AdController extends Controller
 
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getlistUserAds()
+    {
+        $id = auth()->id();
+        try {
+            $ads = $this->adRepository->listUserAds($id);
+            $count = $this->adRepository->listUserAds($id)->count();
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $ads,
+                'count' => $count]);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+//            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getlistFavoriteAds()
     {
         $id = auth()->id();

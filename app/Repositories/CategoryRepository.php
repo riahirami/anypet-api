@@ -17,11 +17,7 @@ class CategoryRepository
     //listing
     static function index(array $data)
     {
-//              $value = "";
-//              $categories =   Category::byTitle($value)
-//                                        ->byName($value)
-//                                        ->byDate($value)
-//                                        ->get();
+
         $perPage = $data['perpage'] ?? config('constants.PER_PAGE');
         $orderBy = $data['orderBy'] ?? config('constants.ORDER_BY');
         $orderDirection = $data['order_direction'] ?? config('constants.ORDER_DIRECTION');
@@ -35,7 +31,6 @@ class CategoryRepository
     {
         $category = new Category();
         $category->title = $data['title'];
-        $category->description = $data['description'];
         $category->save();
         return $category;
     }
@@ -44,7 +39,6 @@ class CategoryRepository
     {
         $category = Category::find($id);
         $category->title = $data['title'];
-        $category->description = $data['description'];
         $category->save();
         return $category;
 

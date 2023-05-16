@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'status', 'country', 'state', 'city', 'street', 'postal_code', 'category_id'];
+    protected $fillable = ['title', 'description', 'status', 'state', 'city', 'street', 'postal_code', 'category_id','user_id'];
 
     protected $attributes = [
         'status' => 0,
@@ -21,6 +22,10 @@ class Ad extends Model
         return $this->morphMany(Media::class, 'mediable');
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
     public function category(): HasOne
     {
         return $this->hasOne(Category::class);
@@ -37,6 +42,11 @@ class Ad extends Model
         return $this->hasMany(Comment::class);
     }
 
+    public function scopeUserAdList($query, $userId)
+    {
+        $query = $query->where('user_id', $userId);
+        return $query;
+    }
     public function scopeByDate($query, $date)
     {
         $formattedDate = date('Y-m-d', strtotime($date));
@@ -81,4 +91,9 @@ class Ad extends Model
     }
 
 
+
+    public static function getAdsMediaUser($ad_id){
+        $ads = Ad::with('user','media','category')->get();
+        return $ads;
+    }
 }

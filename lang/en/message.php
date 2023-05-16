@@ -20,6 +20,8 @@ return [
     'errorUpdateAd' => 'Problem occured while updating ad',
     'errorDeleteAd' => 'Problem occured while deleting ad',
 
+    'userNotFound' => 'no user found',
+
     'adNotFound' => 'no ad found',
     'adUpdated' => 'ad updated successfully',
     'adDeleted' => 'ad deleted successfully',
@@ -39,6 +41,11 @@ return [
     'errorDeletecategory' => 'Problem occured while deleting category',
     'successDeletedcategory' => 'Category deleted successfully',
 
+
+    'successSetAdmin' => 'user set as admin successfully',
+    'errorSetAdmin' => 'Problem occured when changing this user role to admin',
+    'SuccessRevokeAdmin' => 'Admin set as user successfully',
+    'errorRevokeAdmin' => 'Problem occured when changing this admin role to user',
 
 
 

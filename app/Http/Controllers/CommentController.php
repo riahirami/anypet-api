@@ -23,7 +23,8 @@ class CommentController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @param $ad_id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index($ad_id)
     {
@@ -38,7 +39,9 @@ class CommentController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @param $ad_id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create($ad_id, Request $request)
     {
@@ -62,6 +65,12 @@ class CommentController extends Controller
 
     }
 
+    /**
+     * @param $ad_id
+     * @param $parent_id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function replyComment($ad_id, $parent_id, Request $request)
     {
         $user_id = auth()->id();
@@ -101,7 +110,8 @@ class CommentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {

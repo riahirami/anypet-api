@@ -14,14 +14,18 @@ return new class extends Migration
         Schema::create('ads', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('description');
-            $table->tinyInteger('status');
-            $table->string('country');
-            $table->string('state');
+            $table->longText('description');
+            $table->unsignedInteger('status')->default(0)->change();
+            $table->integer('state');
+            $table->integer('status');
             $table->string('city');
             $table->string('street');
             $table->string('postal_code');
             $table->timestamps();
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

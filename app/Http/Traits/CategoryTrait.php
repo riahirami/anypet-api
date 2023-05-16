@@ -10,11 +10,14 @@ use Illuminate\Http\Request;
 trait CategoryTrait
 {
 
+    /**
+     * @param Request $request
+     * @return array
+     */
     public function getFillderRequest(Request $request)
     {
         return [
             'title' => $request->title,
-            'description' => $request->description
         ];
     }
 

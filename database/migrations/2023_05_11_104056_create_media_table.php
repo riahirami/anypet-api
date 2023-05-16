@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('mime_type');
             $table->morphs('mediable');
             $table->timestamps();
+
         });
 
     }

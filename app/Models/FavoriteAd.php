@@ -21,7 +21,7 @@ class FavoriteAd extends Model
 
     public function scopeFavoriteList($query, $userId)
     {
-        $query = $query->where('user_id', $userId);
+        $query = $query->where('user_id', $userId)->with('ad.media');
         return $query;
     }
 }

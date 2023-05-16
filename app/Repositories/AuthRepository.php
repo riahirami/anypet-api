@@ -50,8 +50,8 @@ class AuthRepository
     {
         if (!Auth::user()) {
             $user = User::create([
-                'name' => $request->name,
-                'login' => $request->login,
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,

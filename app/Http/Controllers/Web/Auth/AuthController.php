@@ -38,6 +38,10 @@ class AuthController extends Controller
         $this->auth = $auth;
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function updateAvatar(Request $request)
     {
         try {
@@ -55,6 +59,9 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function profile()
     {
         $user = $this->auth->profile();
@@ -72,6 +79,10 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @param AuthLoginRequest $request
+     * @return JsonResponse
+     */
     public function login(AuthLoginRequest $request)
     {
         $validatedRequest = $request->validated();
@@ -91,6 +102,10 @@ class AuthController extends Controller
 
     }
 
+    /**
+     * @param AuthRegistreRequest $request
+     * @return JsonResponse
+     */
     public function register(AuthRegistreRequest $request): JsonResponse
     {
         $validatedRequest = $request->validated();
@@ -111,6 +126,9 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function logout()
     {
         $user = Auth::user();
@@ -125,6 +143,9 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function refresh()
     {
         $refresh = $this->auth->refresh();
@@ -138,6 +159,10 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @param EmailVerificationRequest $request
+     * @return JsonResponse
+     */
     public function SendEmailVerification(EmailVerificationRequest $request)
     {
         if (!$request->user()->email_verified_at) {
@@ -151,6 +176,10 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function ResendEmailVerification(Request $request)
     {
         if (!$request->user()->email_verified_at) {
@@ -164,6 +193,11 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @param AuthForgotPasswordeRequest $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
     public function forgotPassword(AuthForgotPasswordeRequest $request)
     {
         $validatedRequest = $request->validated();
@@ -178,6 +212,10 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * @param AuthResetPasswordeRequest $request
+     * @return JsonResponse
+     */
     public function reset(AuthResetPasswordeRequest $request)
     {
         $validatedRequest = $request->validated();

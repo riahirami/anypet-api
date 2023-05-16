@@ -25,6 +25,10 @@ class CategoryController extends \App\Http\Controllers\Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         try {
@@ -42,10 +46,14 @@ class CategoryController extends \App\Http\Controllers\Controller
         }
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
-        $category = $this->category->show($id);
         try {
+        $category = $this->category->show($id);
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $category]);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorfindCategory'));
@@ -55,7 +63,10 @@ class CategoryController extends \App\Http\Controllers\Controller
     }
 
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         try {
@@ -69,7 +80,11 @@ class CategoryController extends \App\Http\Controllers\Controller
         }
     }
 
-
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -83,7 +98,10 @@ class CategoryController extends \App\Http\Controllers\Controller
         }
     }
 
-
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public
     function destroy($id)
     {

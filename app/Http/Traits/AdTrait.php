@@ -9,12 +9,15 @@ use Illuminate\Http\Request;
 
 trait AdTrait
 {
+    /**
+     * @param Request $request
+     * @return array
+     */
     public function getFillerRequest(Request $request)
     {
         $data = [
             'title' => $request->title,
             'description' => $request->description,
-            'country' => $request->country,
             'status' => 0,
             'state' => $request->state,
             'city' => $request->city,
@@ -26,6 +29,26 @@ trait AdTrait
         return $data;
     }
 
+    public function getFillerUpdateRequest(Request $request)
+    {
+        $data = [
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'state' => $request->input('state'),
+            'city' => $request->input('city'),
+            'street' => $request->input('street'),
+            'postal_code' => $request->input('postal_code'),
+            'category_id' => $request->input('category_id'),
+            'media' => $request->file('media') // Remove '*'
+        ];
+
+        return $data;
+    }
+
+    /**
+     * @param $request
+     * @return array
+     */
     public function getQueryParameters($request)
     {
         return [
@@ -40,6 +63,10 @@ trait AdTrait
         ];
     }
 
+    /**
+     * @param $request
+     * @return array
+     */
     public function getStatusQueryParameters($request)
     {
         return [

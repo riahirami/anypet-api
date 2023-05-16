@@ -7,6 +7,8 @@ Route::put('/{id}', [AdController::class, 'update'])->name('ads.update');
 
 Route::middleware(['auth.jwt','verified'])->group(function(){
     Route::get('/listfavorite', [AdController::class,'getlistFavoriteAds'])->name('favorite-ads.list');
+    Route::get('/myads', [AdController::class,'getlistUserAds'])->name('user-ads.list');
+    Route::get('/allmedia', [AdController::class,'getAllMedia'])->name('allmedia.list');
     Route::get('/', [AdController::class, 'index'])->name('ads.index');
     Route::post('/', [AdController::class, 'store'])->name('ads.store');
     Route::get('/requestad', [AdController::class, 'requestAds'])->name('ads.requestads');
