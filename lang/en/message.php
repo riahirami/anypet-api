@@ -48,6 +48,9 @@ return [
     'errorRevokeAdmin' => 'Problem occured when changing this admin role to user',
 
 
+    'unauthorized' => 'Problem occured, you are not authorized to accomplish this operation',
+
+
 
 
 

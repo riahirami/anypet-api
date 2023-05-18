@@ -51,9 +51,12 @@ class CommentRepository
     {
 
         $comment = Comment::findOrFail($id);
-        $comment->delete();
-        return $comment;
-
+        $user = auth()->id();
+        if ($comment->user_id == $user) {
+            $comment->delete();
+            return $comment;
+        } else
+            return response()->json(['message' => trans('message.unauthorized')]);
     }
 
     public function listAdComments($ad_id)

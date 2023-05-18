@@ -24,7 +24,7 @@ class RoleRepository
      * @return mixed
      */
     public function revokeAdmin($id){
-        $user = USer::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->role_id = 1;
         $user->save();
         return $user ;

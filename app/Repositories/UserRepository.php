@@ -15,7 +15,9 @@ class UserRepository
         $orderBy = $data['orderBy'] ?? config('constants.ORDER_BY');
         $orderDirection = $data['order_direction'] ?? config('constants.ORDER_DIRECTION');
         $page = $data['page'] ?? config('constants.PAGE');
+        $connectedUserId = auth()->user()->id;
         return User::query()
+            ->where('id', '!=', $connectedUserId)
             ->orderBy($orderBy, $orderDirection)
             ->paginate($perPage, ['*'], $page);
     }

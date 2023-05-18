@@ -18,9 +18,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 |
 */
 
-
-Route::controller(RoleController::class)->group(function () {
-    Route::patch('setadmin/{id}', 'setAdmin')->name('set_Admin');
-    Route::patch('revokeadmin/{id}', 'revokeAdmin')->name('revoke_Admin');
-
+Route::middleware(['auth.jwt', 'verified', 'role'])->group(function () {
+    Route::put('setadmin/{id}',[RoleController::class, 'setAdmin'])->name('set_Admin');
+    Route::put('revokeadmin/{id}',[RoleController::class, 'revokeAdmin'])->name('revoke_Admin');
 });

@@ -20,7 +20,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     ];
 
     protected $attributes = [
-        'role_id' => 1,
+        'role_id' => "1",
     ];
 
     protected $hidden = [

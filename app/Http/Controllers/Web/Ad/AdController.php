@@ -7,6 +7,7 @@ use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
 use App\Http\Traits\CategoryTrait;
 use App\Http\Traits\GlobalTrait;
+use App\Models\Ad;
 use App\Repositories\AdRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -111,10 +112,19 @@ class AdController extends Controller
     public function destroy($id)
     {
         try {
-            $ad = $this->adRepository->delete($id);
-            return $this->returnSuccessResponse(Response::HTTP_OK,
-                trans('message.adDeleted')
-            );
+            $ad = Ad::findOrfail($id);
+            $user = auth()->id();
+            if ($ad->user_id == $user) {
+
+                $this->adRepository->delete($id);
+
+                return $this->returnSuccessResponse(Response::HTTP_OK,
+                    trans('message.adDeleted')
+                );
+            }
+            else
+                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
+
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeleteAd'));
         } catch (\Exception $e) {
@@ -125,7 +135,8 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getAllMedia(){
+    public function getAllMedia()
+    {
         try {
             $media = $this->adRepository->getAllMedia();
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $media]);
