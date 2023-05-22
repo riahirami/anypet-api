@@ -38,6 +38,12 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Ad::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+
     public function role() : HasOne
     {
         return  $this->hasOne(Role::class);
@@ -74,6 +80,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->belongsToMany(Ad::class, 'favorite_ads')->withTimestamps();
     }
+
 
 
 }

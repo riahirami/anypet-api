@@ -23,8 +23,9 @@ class UserRepository
     }
 
     public function show($id){
-        $user = User::find($id);
-        return $user ;
+        $user = User::with('ads','comments')->find($id);
+
+        return $user;
     }
 
     public function verifiedUsers(){

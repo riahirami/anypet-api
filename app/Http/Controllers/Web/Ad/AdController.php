@@ -300,9 +300,9 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getlistUserAds()
+    public function getlistUserAds($id)
     {
-        $id = auth()->id();
+//        $id = auth()->id();
         try {
             $ads = $this->adRepository->listUserAds($id);
             $count = $this->adRepository->listUserAds($id)->count();
@@ -319,9 +319,9 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getlistFavoriteAds()
+    public function getlistFavoriteAds($id)
     {
-        $id = auth()->id();
+//        $id = auth()->id();
         try {
             $ads = $this->adRepository->listFavoriteAds($id);
             $count = $this->adRepository->listFavoriteAds($id)->count();
