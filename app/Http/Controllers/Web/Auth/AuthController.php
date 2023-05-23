@@ -48,13 +48,12 @@ class AuthController extends Controller
             if ($request->hasFile('avatar')) {
                 $avatar = $this->auth->setAvatar($request);
                 return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $avatar]);
-            }
-            else{
-                return $this->returnSuccessResponse(Response::HTTP_BAD_REQUEST, ['message'=>'no avatar selected']);
+            } else {
+                return $this->returnSuccessResponse(Response::HTTP_BAD_REQUEST, ['message' => 'no avatar selected']);
 
             }
         } catch (HttpClientException $e) {
-               return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
 
         }
     }
@@ -86,19 +85,21 @@ class AuthController extends Controller
     public function login(AuthLoginRequest $request)
     {
         $validatedRequest = $request->validated();
-        $user = $this->auth->login($request);
-        if ($user) {
-            return response()->json([
-                'name' => Auth::user()->name,
-                'token' => $user,
-                'message' => 'ye are logged in',
+        try {
 
-            ], 200);
+            $user = $this->auth->login($request);
+            if ($user) {
+                return $this->returnSuccessResponse(Response::HTTP_OK, [
+                    'user' => Auth::user(),
+                    'token' => $user,
+                    'message' => 'ye are logged in',
+
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('error sign in'));
         }
-        return response()->json([
-            'message' => 'error sign in',
 
-        ], 500);
 
     }
 

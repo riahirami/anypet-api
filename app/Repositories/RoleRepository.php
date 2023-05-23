@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 
+use App\Models\Role;
 use App\Models\User;
+use App\Notifications\RoleChangedNotification;
 
 class RoleRepository
 {
@@ -16,6 +18,10 @@ class RoleRepository
         $user = User::findOrFail($id);
         $user->role_id = 2;
         $user->save();
+        if ($user) {
+            $newRole = Role::find(2);
+            $user->notify(new RoleChangedNotification($newRole));
+        }
         return $user;
     }
 
@@ -23,10 +29,15 @@ class RoleRepository
      * @param $id
      * @return mixed
      */
-    public function revokeAdmin($id){
-        $user = USer::findOrFail($id);
+    public function revokeAdmin($id)
+    {
+        $user = User::findOrFail($id);
         $user->role_id = 1;
         $user->save();
-        return $user ;
+        if ($user) {
+            $newRole = Role::find(1);
+            $user->notify(new RoleChangedNotification($newRole));
+        }
+        return $user;
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\FavoriteAd;
 use App\Models\Media;
 use App\Models\User;
+use App\Notifications\AdStatusUpdated;
 use Illuminate\Http\Request;
 use App\Http\Traits\CategoryTrait;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,7 @@ class AdRepository
      */
     static function index(array $parameters)
     {
-        return Ad::query()->with('media','user')
+        return Ad::query()->with('media', 'user')
             ->byKeyword($parameters['keyword'])
             ->byStatus($parameters['status'])
             ->byDate($parameters['date'])
@@ -40,7 +41,7 @@ class AdRepository
     public
     function show($id)
     {
-        return Ad::with('media','user')->findOrFail($id);
+        return Ad::with('media', 'user')->findOrFail($id);
     }
 
     /**
@@ -71,6 +72,10 @@ class AdRepository
                 $ad->media()->save($media);
             }
         }
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notifyIfNewAdInFavoriteCategoryAdded($ad);
+        }
         return $ad;
     }
 
@@ -84,32 +89,39 @@ class AdRepository
     function update(array $data, $id)
     {
         $ad = Ad::findOrFail($id);
-        $ad->title = $data['title'];
-        $ad->description = $data['description'];
-        $ad->state = $data['state'];
-        $ad->city = $data['city'];
-        $ad->street = $data['street'];
-        $ad->postal_code = $data['postal_code'];
-        $ad->category_id = $data['category_id'];
-        $ad->save();
-        if (isset($data['media'])) {
-            foreach ($data['media'] as $file) {
-                $media = new Media();
-                $media->file_name = $file->getClientOriginalName();
-                $media->file_path = url(Storage::url($file->store('public/ads')));
-                $media->mime_type = $file->getClientMimeType();
-                $ad->media()->save($media);
+        $user = auth()->id();
+        if ($ad->user_id == $user) {
+            $ad = AD::destroy($id);
+
+            $ad->title = $data['title'];
+            $ad->description = $data['description'];
+            $ad->state = $data['state'];
+            $ad->city = $data['city'];
+            $ad->street = $data['street'];
+            $ad->postal_code = $data['postal_code'];
+            $ad->category_id = $data['category_id'];
+            $ad->save();
+            if (isset($data['media'])) {
+                foreach ($data['media'] as $file) {
+                    $media = new Media();
+                    $media->file_name = $file->getClientOriginalName();
+                    $media->file_path = url(Storage::url($file->store('public/ads')));
+                    $media->mime_type = $file->getClientMimeType();
+                    $ad->media()->save($media);
+                }
             }
-        }
-        return $ad;
+            return $ad;
+        } else
+            return response()->json(['message' => trans('message.unauthorized')]);
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function getAllMedia(){
+    public function getAllMedia()
+    {
         $ads = Ad::query()->with('media')->get();
-        return $ads ;
+        return $ads;
     }
 
     /**
@@ -140,7 +152,7 @@ class AdRepository
      */
     public function getAdsByCategory($categoryId)
     {
-        $ads = Ad::with('media','user')->byCategory($categoryId)->get();
+        $ads = Ad::with('media', 'user')->byCategory($categoryId)->get();
         return $ads;
     }
 
@@ -174,6 +186,11 @@ class AdRepository
         $ad = Ad::findOrFail($parameters['id']);
         $ad->status = $parameters['status'];
         $ad->save();
+        if($ad){
+            $ad->user->notify(new AdStatusUpdated($ad));
+//            $latestNotification = $ad->user->notifications()->latest()->first();
+
+        }
         return $ad;
     }
 
@@ -219,7 +236,7 @@ class AdRepository
      */
     public function listUserAds($id)
     {
-        $ads = Ad::with('media','user')->UserAdList($id)->get();
+        $ads = Ad::with('media', 'user')->UserAdList($id)->get();
         return $ads;
     }
 
@@ -229,19 +246,20 @@ class AdRepository
      */
     public function listFavoriteAds($id)
     {
-        $favoriteAds = FavoriteAd::favoriteList($id)->with('ad','user','media')->get();
+        $favoriteAds = FavoriteAd::favoriteList($id)->with('ad', 'user')->get();
         return $favoriteAds;
     }
 
     /**
      * @param $id
-     * @return int
+     * @return \Illuminate\Http\JsonResponse|int
      */
     public function delete($id)
     {
-        $ad = AD::destroy($id);
-        return $ad;
+            $ad = Ad::destroy($id);
+            return $ad;
     }
+
 }
 
 

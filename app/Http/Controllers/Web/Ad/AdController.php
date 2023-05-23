@@ -7,6 +7,8 @@ use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
 use App\Http\Traits\CategoryTrait;
 use App\Http\Traits\GlobalTrait;
+use App\Models\Ad;
+use App\Notifications\AdStatusUpdated;
 use App\Repositories\AdRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -111,10 +113,19 @@ class AdController extends Controller
     public function destroy($id)
     {
         try {
-            $ad = $this->adRepository->delete($id);
-            return $this->returnSuccessResponse(Response::HTTP_OK,
-                trans('message.adDeleted')
-            );
+            $ad = Ad::findOrfail($id);
+            $user = auth()->id();
+            if ($ad->user_id == $user) {
+
+                $this->adRepository->delete($id);
+
+                return $this->returnSuccessResponse(Response::HTTP_OK,
+                    trans('message.adDeleted')
+                );
+            }
+            else
+                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
+
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeleteAd'));
         } catch (\Exception $e) {
@@ -125,7 +136,8 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getAllMedia(){
+    public function getAllMedia()
+    {
         try {
             $media = $this->adRepository->getAllMedia();
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $media]);
@@ -225,14 +237,11 @@ class AdController extends Controller
 
         $parameters = $this->getStatusQueryParameters($request);
         try {
-
-//            if(isNull($parameters["id"])){
-//                return $this->returnSuccessResponse(Response::HTTP_NOT_MODIFIED, );
-//            }
             $ad = $this->adRepository->updateAdStatus($parameters);
-            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.errorUpdateAd'), 'data' => $ad]);
+
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.adUpdated'), 'data' => $ad]);
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 
@@ -289,9 +298,9 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getlistUserAds()
+    public function getlistUserAds($id)
     {
-        $id = auth()->id();
+//        $id = auth()->id();
         try {
             $ads = $this->adRepository->listUserAds($id);
             $count = $this->adRepository->listUserAds($id)->count();
@@ -308,9 +317,9 @@ class AdController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getlistFavoriteAds()
+    public function getlistFavoriteAds($id)
     {
-        $id = auth()->id();
+//        $id = auth()->id();
         try {
             $ads = $this->adRepository->listFavoriteAds($id);
             $count = $this->adRepository->listFavoriteAds($id)->count();
