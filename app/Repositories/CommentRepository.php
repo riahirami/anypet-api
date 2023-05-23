@@ -17,6 +17,7 @@ class CommentRepository
         $comment->user_id = $user_id;
         $comment->ad_id = $ad_id;
         $comment->save();
+
         return $comment;
     }
 

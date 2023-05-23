@@ -12,14 +12,19 @@ use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
-    protected $useRepository ;
-    use UserTrait ;
+    protected $useRepository;
+    use UserTrait;
     use GlobalTrait;
 
     public function __construct(UserRepository $useRepository)
     {
         $this->userRepository = $useRepository;
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $parameters = $this->getQueryParameters($request);
@@ -33,6 +38,10 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         try {
@@ -45,16 +54,73 @@ class UserController extends Controller
         }
     }
 
-    public function showVerifiedUsers(){
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showVerifiedUsers()
+    {
         try {
             $users = $this->userRepository->verifiedUsers();
-//            dd($users);
+           dd($users);
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $users]);
-       } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
 
+    /**
+     * @param $user_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userNotifications($user_id)
+    {
+        try {
+            $notifications = $this->userRepository->getNotifications($user_id);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notifications]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
 
+    /**
+     * @param $user_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userUnreadNotifications($user_id)
+    {
+        try {
+            $notifications = $this->userRepository->unreadNotifications($user_id);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notifications]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
 
+    /**
+     * @param $notification_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markOneNotificationAsRead($notification_id)
+    {
+        try {
+            $notification = $this->userRepository->markOneNotificationsAsRead($notification_id);
+
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notification]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAllNotificationsAsRead()
+    {
+        try {
+            $notifications = $this->userRepository->markAllNotificationsAsRead();
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notifications]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
 }

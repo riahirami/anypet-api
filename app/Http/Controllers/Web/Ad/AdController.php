@@ -8,6 +8,7 @@ use App\Http\Traits\AdTrait;
 use App\Http\Traits\CategoryTrait;
 use App\Http\Traits\GlobalTrait;
 use App\Models\Ad;
+use App\Notifications\AdStatusUpdated;
 use App\Repositories\AdRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -236,14 +237,11 @@ class AdController extends Controller
 
         $parameters = $this->getStatusQueryParameters($request);
         try {
-
-//            if(isNull($parameters["id"])){
-//                return $this->returnSuccessResponse(Response::HTTP_NOT_MODIFIED, );
-//            }
             $ad = $this->adRepository->updateAdStatus($parameters);
-            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.errorUpdateAd'), 'data' => $ad]);
+
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.adUpdated'), 'data' => $ad]);
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 

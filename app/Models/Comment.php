@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Notifications\AdCommented;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
     use HasFactory;
+
 
     public function user()
     {
@@ -17,6 +19,15 @@ class Comment extends Model
     public function ad()
     {
         return $this->belongsTo(Ad::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function (Comment $comment) {
+            $adOwner = $comment->ad->user;
+            $adOwner->notify(new AdCommented($comment->ad));
+        });
     }
 
     public function replyComments()

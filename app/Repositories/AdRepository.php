@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\FavoriteAd;
 use App\Models\Media;
 use App\Models\User;
+use App\Notifications\AdStatusUpdated;
 use Illuminate\Http\Request;
 use App\Http\Traits\CategoryTrait;
 use Illuminate\Support\Facades\Log;
@@ -70,6 +71,10 @@ class AdRepository
                 $media->mime_type = $file->getClientMimeType();
                 $ad->media()->save($media);
             }
+        }
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notifyIfNewAdInFavoriteCategoryAdded($ad);
         }
         return $ad;
     }
@@ -181,6 +186,11 @@ class AdRepository
         $ad = Ad::findOrFail($parameters['id']);
         $ad->status = $parameters['status'];
         $ad->save();
+        if($ad){
+            $ad->user->notify(new AdStatusUpdated($ad));
+//            $latestNotification = $ad->user->notifications()->latest()->first();
+
+        }
         return $ad;
     }
 
@@ -249,6 +259,7 @@ class AdRepository
             $ad = Ad::destroy($id);
             return $ad;
     }
+
 }
 
 

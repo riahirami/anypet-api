@@ -9,4 +9,10 @@ Route::get('/', [UserController::class, 'index'])->middleware('role')->name('use
 Route::middleware(['auth.jwt','verified'])->group(function(){
     Route::get('/verified', [UserController::class, 'showVerifiedUsers'])->name('users.verifiedUserscompt');
     Route::get('/{id}', [UserController::class, 'show'])->name('user.show');
- });
+   });
+
+
+Route::get('notifications/{id}', [UserController::class, 'userNotifications'])->middleware('auth.jwt','verified')->name('user.userNotifications');
+Route::get('notifications/unread/{id}', [UserController::class, 'userUnreadNotifications'])->middleware('auth.jwt','verified')->name('user.userUnreadNotifications');
+Route::post('notifications/readone/{id}', [UserController::class, 'markOneNotificationAsRead'])->middleware('auth.jwt','verified')->name('user.notificationreadone');
+Route::post('notifications/readall', [UserController::class, 'markAllNotificationsAsRead'])->middleware('auth.jwt','verified')->name('user.notificationreadall');

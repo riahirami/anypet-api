@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Notifications\AdMatchingInterrestNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
@@ -49,7 +52,18 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return  $this->hasOne(Role::class);
     }
 
+    public function userNotifications(): MorphMany
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
+    }
 
+    public function scopeWithNotifications($query)
+    {
+        return $query->with(['userNotifications' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -79,6 +93,19 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function favoriteAds()
     {
         return $this->belongsToMany(Ad::class, 'favorite_ads')->withTimestamps();
+    }
+
+    public function notifyIfNewAdInFavoriteCategoryAdded(Ad $ad)
+    {
+        // Check if the user has a favorite ad in the same category as the new ad
+        $hasFavoriteAdInCategory = $this->favoriteAds()
+            ->where('category_id', $ad->category_id)
+            ->exists();
+
+        if ($hasFavoriteAdInCategory) {
+            // Notify the user about the new ad in their favorite category
+            $this->notify(new AdMatchingInterrestNotification($ad));
+        }
     }
 
 
