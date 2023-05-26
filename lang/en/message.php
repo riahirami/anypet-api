@@ -51,6 +51,10 @@ return [
     'unauthorized' => 'Problem occured, you are not authorized to accomplish this operation',
 
 
+    'errorGetConversation' => 'Problem occured while searching this conversation',
+    'errorSendMessage' => 'Problem occured while sending your message',
+
+
 
 
 

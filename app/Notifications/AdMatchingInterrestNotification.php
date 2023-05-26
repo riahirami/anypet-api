@@ -55,7 +55,7 @@ class AdMatchingInterrestNotification extends Notification
         return [
             'ad_id' => $this->ad->id,
             'title' => $this->ad->title,
-            'ad_url' => url('/ads/' . $this->ad->id),
+            'url' => url('/ads/' . $this->ad->id),
 
 
         ];

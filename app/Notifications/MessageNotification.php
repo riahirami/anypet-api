@@ -2,22 +2,23 @@
 
 namespace App\Notifications;
 
+use App\Models\Messages;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 
-class RoleChangedNotification extends Notification
+class MessageNotification extends Notification
 {
     use Queueable;
-
+    public $message;
     /**
      * Create a new notification instance.
      */
-    public function __construct($newRole)
+    public function __construct(Messages $message)
     {
-        $this->newRole = $newRole;
+        $this->message = $message ;
     }
 
     /**
@@ -27,7 +28,7 @@ class RoleChangedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -35,14 +36,10 @@ class RoleChangedNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $role = '';
-        if ($this->newRole->id == 1)
-            $role = "User";
-        elseif ($this->newRole->id == 2)
-            $role = "Admin";
         return (new MailMessage)
-            ->line('Your role has been changed to ' . $role)
-            ->line('Thank you for using AnyPet!');
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
+                    ->line('Thank you for using our application!');
     }
 
     /**
@@ -53,11 +50,10 @@ class RoleChangedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'id' => Str::uuid(), // Generate a new UUID
-            'role_id' => $this->newRole->id,
-            'role' => $this->newRole->role,
-            'url' => url('/profile/'),
-
+            'id' => Str::uuid(),
+            'message' => $this->message->message,
+            'sender' => $this->message->sender->firstname. " ".$this->message->sender->lastname ,
+            'url' => url(':3000/users/conversation/' . $this->message->sender_id),
         ];
     }
 }
