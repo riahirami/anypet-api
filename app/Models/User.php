@@ -56,6 +56,18 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Messages::class, 'sender_id');
     }
 
+    public function sentReservations()
+    {
+        return $this->hasMany(Reservation::class, 'sender_id');
+    }
+
+    public function receivedReservations()
+    {
+        return $this->hasMany(Reservation::class, 'receiver_id');
+    }
+
+
+
     public function userNotifications(): MorphMany
     {
         return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')

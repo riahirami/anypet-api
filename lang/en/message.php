@@ -55,6 +55,11 @@ return [
     'errorSendMessage' => 'Problem occured while sending your message',
 
 
+    'errorStoreReservation' => 'Problem occured while creating your reservation',
+    'errorFindReservation' => 'Problem occured while searching your message',
+    'errorUpdateReservation' => 'Problem occured while updating your message',
+
+
 
 
 

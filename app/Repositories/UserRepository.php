@@ -34,7 +34,8 @@ class UserRepository
      */
     public function show($id)
     {
-        $user = User::with('ads', 'comments')->find($id);
+//        $user = User::with('ads', 'comments')->find($id);
+        $user = User::with('ads.media', 'comments.user')->find($id);
 
         return $user;
     }

@@ -246,7 +246,7 @@ class AdRepository
      */
     public function listFavoriteAds($id)
     {
-        $favoriteAds = FavoriteAd::favoriteList($id)->with('ad', 'user')->get();
+        $favoriteAds = FavoriteAd::favoriteList($id)->with('ad')->get();
         return $favoriteAds;
     }
 

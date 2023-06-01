@@ -31,6 +31,10 @@ class Ad extends Model
         return $this->hasOne(Category::class);
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'ad_id');
+    }
 
     public function favoriteAds()
     {
