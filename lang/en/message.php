@@ -51,6 +51,15 @@ return [
     'unauthorized' => 'Problem occured, you are not authorized to accomplish this operation',
 
 
+    'errorGetConversation' => 'Problem occured while searching this conversation',
+    'errorSendMessage' => 'Problem occured while sending your message',
+
+
+    'errorStoreReservation' => 'Problem occured while creating your reservation',
+    'errorFindReservation' => 'Problem occured while searching your message',
+    'errorUpdateReservation' => 'Problem occured while updating your message',
+
+
 
 
 

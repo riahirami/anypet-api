@@ -2,24 +2,23 @@
 
 namespace App\Notifications;
 
-use App\Models\Ad;
+use App\Models\Reservation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 
-class AdMatchingInterrestNotification extends Notification
+class RespondOnReservationNotification extends Notification
 {
     use Queueable;
-    protected $ad;
-
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Ad $ad)
+    public function __construct(Reservation $reservation)
     {
-        $this->ad = $ad;
+        $this->reservation = $reservation;
 
     }
 
@@ -39,10 +38,9 @@ class AdMatchingInterrestNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('A new ad has been added on the same category of one of your favorite ad.')
-            ->line('Title: ' . $this->ad->title)
-            ->action("Don't miss it", url('/ads/' . $this->ad->id))
-            ->line('Thank you for using AnyPet!');
+            ->line('Your reservation request for the advertisement "' . $this->reservation->advertisement->title . '" has been updated by '. $this->reservation->receiver->firstname )
+            ->action('View Reservation', url('/reservation/show/myreservation'))
+            ->line('Thank you for using Anypet !');
     }
 
     /**
@@ -53,11 +51,12 @@ class AdMatchingInterrestNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'ad_id' => $this->ad->id,
-            'title' => $this->ad->title,
-            'url' => url('/ads/' . $this->ad->id),
-
-
+            'id' => Str::uuid()->toString(), // Generate a new UUID
+            'ad' => $this->reservation->advertisement->title,
+            'receiver' => $this->reservation->receiver,
+            'sender' => $this->reservation->sender,
+            'status' => $this->reservation->status,
+            'url' => url('/ads/' . $this->reservation->advertisement->id)
         ];
     }
 }

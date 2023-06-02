@@ -31,7 +31,7 @@ class AdCommented extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail','database'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -56,6 +56,7 @@ class AdCommented extends Notification implements ShouldQueue
             'id' => Str::uuid(),
             'title' => $this->ad->title,
             'status' => $this->ad->status,
-            'ad_url' => url('/ads/' . $this->ad->id),
-        ];   }
+            'url' => url('/ads/' . $this->ad->id),
+        ];
+    }
 }

@@ -16,10 +16,10 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
-    use HasFactory, Notifiable,HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
-        'firstname','lastname', 'email', 'password', 'phone', 'address', 'avatar'
+        'firstname', 'lastname', 'email', 'password', 'phone', 'address', 'avatar'
     ];
 
     protected $attributes = [
@@ -35,7 +35,6 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     ];
 
 
-
     public function ads(): HasMany
     {
         return $this->hasMany(Ad::class);
@@ -47,10 +46,27 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
 
-    public function role() : HasOne
+    public function role(): HasOne
     {
-        return  $this->hasOne(Role::class);
+        return $this->hasOne(Role::class);
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Messages::class, 'sender_id');
+    }
+
+    public function sentReservations()
+    {
+        return $this->hasMany(Reservation::class, 'sender_id');
+    }
+
+    public function receivedReservations()
+    {
+        return $this->hasMany(Reservation::class, 'receiver_id');
+    }
+
+
 
     public function userNotifications(): MorphMany
     {
@@ -107,7 +123,6 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
             $this->notify(new AdMatchingInterrestNotification($ad));
         }
     }
-
 
 
 }

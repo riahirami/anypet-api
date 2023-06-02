@@ -61,7 +61,6 @@ class UserController extends Controller
     {
         try {
             $users = $this->userRepository->verifiedUsers();
-           dd($users);
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $users]);
         } catch (\Exception $e) {
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));

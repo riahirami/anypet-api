@@ -76,7 +76,7 @@ class AdStatusUpdated extends Notification
             'id' => Str::uuid(), // Generate a new UUID
             'title' => $this->ad->title,
             'status' => $this->ad->status,
-            'ad_url' => url('/ads/' . $this->ad->id),
+            'url' => url('/ads/' . $this->ad->id),
         ];
     }
 }
