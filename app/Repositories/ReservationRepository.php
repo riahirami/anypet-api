@@ -70,8 +70,8 @@ class ReservationRepository
     public function getAuthenticatedUserReservations()
     {
         $user = auth()->user();
-        $reservationsSended = $user->sentReservations()->with('advertisement','receiver')->get();
-        $reservationsReceived = $user->receivedReservations()->with('advertisement','sender')->get();
+        $reservationsSended = $user->sentReservations()->with('advertisement.media','receiver') ->orderBy('created_at', 'desc')->get();
+        $reservationsReceived = $user->receivedReservations()->with('advertisement.media','sender') ->orderBy('created_at', 'desc')->get();
 
         return ['send' => $reservationsSended, 'received' => $reservationsReceived];
     }

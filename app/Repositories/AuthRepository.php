@@ -27,12 +27,13 @@ class AuthRepository
         return Auth::user();
     }
 
-    public function setAvatar(Request $request){
+    public function setAvatar(Request $request)
+    {
 
         $path = Storage::disk('avatars')->put("", $request->file('avatar'));
         $imageUrl = Storage::disk('avatars')->url($path);
-        $connectedUser=User::findOrFail(Auth::id());
-        $connectedUser->avatar=$imageUrl;
+        $connectedUser = User::findOrFail(Auth::id());
+        $connectedUser->avatar = $imageUrl;
         $connectedUser->save();
         return $imageUrl;
     }
@@ -65,10 +66,16 @@ class AuthRepository
 
     public function logout()
     {
-        if (Auth::user()) {
-           return Auth::logout();
+        if (Auth::check()) {
+            Auth::logout();
+
+            return response()->json([
+                'message' => 'Successfully logged out',
+            ], 200);
         }
-        return null ;
+        return response()->json([
+            'message' => 'error',
+        ], 500);
 
     }
 
@@ -79,12 +86,12 @@ class AuthRepository
 
     public function SendEmailVerification(EmailVerificationRequest $request)
     {
-         $request->fulfill();
+        $request->fulfill();
     }
 
     public function ResendEmailVerification(Request $request)
     {
-            return   $request->user()->sendEmailVerificationNotification();
+        return $request->user()->sendEmailVerificationNotification();
 
     }
 
@@ -119,7 +126,7 @@ class AuthRepository
             return $status;
         }
 
-        return null ;
+        return null;
 
     }
 

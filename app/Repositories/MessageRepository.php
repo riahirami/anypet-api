@@ -23,8 +23,10 @@ class MessageRepository
             'receiver_id' => intval($request->receiver_id),
             'message' => $request->message,
         ]);
+        $sender_avatar = $msg->sender->avatar;
+        $receiver_avatar = $msg->receiver->avatar;
 
-        event(new MessageEvent($sender_id, intval($request->receiver_id), $request->message));
+        event(new MessageEvent($sender_id, intval($request->receiver_id), $request->message, $sender_avatar, $receiver_avatar));
         $msg->receiver->notify(new MessageNotification($msg));
         return response()->json(['message' => 'your message has been created successfully'], 201);
     }

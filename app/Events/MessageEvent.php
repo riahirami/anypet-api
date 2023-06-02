@@ -18,15 +18,20 @@ class MessageEvent implements ShouldBroadcast
     public $receiver_id;
 
     public $message;
+    public $receiver_avatar;
+    public $sender_avatar;
+
 
     /**
      * Create a new event instance.
      */
-    public function __construct($sender_id, $receiver_id, $message)
+    public function __construct($sender_id, $receiver_id, $message, $sender_avatar,$receiver_avatar)
     {
         $this->sender_id = $sender_id;
         $this->receiver_id = $receiver_id;
         $this->message = $message;
+        $this->sender_avatar = $sender_avatar;
+        $this->receiver_avatar = $receiver_avatar;
     }
 
 
@@ -41,6 +46,9 @@ class MessageEvent implements ShouldBroadcast
             'sender_id' => $this->sender_id,
             'receiver_id' => $this->receiver_id,
             'message' => $this->message,
+            'sender_avatar' => $this->sender_avatar,
+            'receiver_avatar' => $this->receiver_avatar,
+
         ];
     }
 
