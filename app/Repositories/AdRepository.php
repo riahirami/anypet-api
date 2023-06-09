@@ -30,6 +30,7 @@ class AdRepository
             ->byKeyword($parameters['keyword'])
             ->byStatus($parameters['status'])
             ->byDate($parameters['date'])
+            ->byState($parameters['state'])
             ->orderBy($parameters['orderBy'], $parameters['orderDirection'])
             ->paginate($parameters['perPage'], ['*'], null, $parameters['page']);
     }
@@ -91,7 +92,7 @@ class AdRepository
         $ad = Ad::findOrFail($id);
         $user = auth()->id();
         if ($ad->user_id == $user) {
-            $ad = AD::destroy($id);
+//            $ad = AD::destroy($id);
 
             $ad->title = $data['title'];
             $ad->description = $data['description'];
@@ -152,7 +153,10 @@ class AdRepository
      */
     public function getAdsByCategory($categoryId)
     {
-        $ads = Ad::with('media', 'user')->byCategory($categoryId)->get();
+        $ads = Ad::with('media', 'user')->byCategory($categoryId)
+            ->byStatus('2')
+            ->paginate(10, ['*'], null, 1);
+//        ->get();
         return $ads;
     }
 

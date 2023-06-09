@@ -64,6 +64,10 @@ class Ad extends Model
     {
         return $query->where('category_id', $id);
     }
+    public function scopeByState($query, $state)
+    {  if (isset($state))
+        return $query->where('state', $state);
+    }
 
     public function scopeByStatus($query, $status)
     {

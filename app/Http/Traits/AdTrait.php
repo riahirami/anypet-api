@@ -58,6 +58,7 @@ trait AdTrait
             'page' => $request->input('page', config('constants.PAGE')),
             'keyword' => $request->input('keyword'),
             'status' => $request->input('status'),
+            'state' => $request->input('state'),
             'date' => $request->input('date'),
 
         ];

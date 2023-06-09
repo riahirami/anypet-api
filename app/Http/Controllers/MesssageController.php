@@ -58,5 +58,15 @@ class MesssageController extends Controller
         }
     }
 
-
+    public function contactAdmin(Request $request)
+    {
+        try {
+            $response = $this->messageRepository->ContactAdmin($request);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, $response->original);
+        } catch (ModelNotFoundException) {
+            return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorSendMessage'));
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+        }
+    }
 }

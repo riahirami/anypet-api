@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ads', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('title');
             $table->longText('description');
-            $table->unsignedInteger('status')->default(0)->change();
+            $table->unsignedInteger('status')->default(0);
             $table->integer('state');
-            $table->integer('status');
             $table->string('city');
             $table->string('street');
             $table->string('postal_code');

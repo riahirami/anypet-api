@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Auth\AuthController;
+use App\Http\Controllers\MesssageController;
 use App\Http\Controllers\Web\Ad\CategoryController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -33,6 +34,8 @@ Route::post('email/resend-verification', [AuthController::class,'ResendEmailVeri
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'reset'])->name('password.reset');
 Route::post('avatar', [AuthController::class, 'updateAvatar'])->name('avatar');
+
+Route::post('contact-us', [MesssageController::class, 'contactAdmin'])->name('contactAdmin');
 
 
 
