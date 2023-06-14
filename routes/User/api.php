@@ -21,5 +21,6 @@ Route::post('notifications/readall', [UserController::class, 'markAllNotificatio
 
 
 Route::post('message/{receiver_id}', [MesssageController::class, 'sendMessage'])->name('user.SendMessage');
+Route::post('contact-us', [MesssageController::class, 'contactAdmin'])->name('user.contactAdmin');
 Route::get('conversation/{user_id}', [MesssageController::class, 'getConversationMsg'])->name('user.conversationMsg');
 Route::get('conversations/list', [MesssageController::class, 'conversations'])->name('user.getConversations');

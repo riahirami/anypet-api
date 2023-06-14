@@ -22,7 +22,7 @@ class ReservationRepository
             'ad_id' => 'required|exists:ads,id',
             'receiver_id' => 'required|exists:users,id',
             'message' => 'nullable',
-            'reservation_date' => 'nullable',
+            'reservation_date' => 'required',
         ]);
 
         $sender = auth()->user();
@@ -35,7 +35,7 @@ class ReservationRepository
             'receiver_id' => $receiver->id,
             'message' => $validatedData['message'],
             'reservation_date' => $validatedData['reservation_date'],
-            'status' => 'pending',
+            'status' => 'waiting',
         ]);
         if ($reservation) {
             $reservation->receiver->notify(new ReservationNotification($reservation));
