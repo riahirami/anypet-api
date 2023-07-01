@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Traits\GlobalTrait;
+use App\Http\Traits\PartnerTrait;
 use App\Repositories\PartnersRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ class PartnerController extends Controller
 {
     protected $partnerRepository;
     use GlobalTrait;
+    use PartnerTrait ;
 
     public function __construct(PartnersRepository $partnerRepository)
     {
@@ -22,7 +24,7 @@ class PartnerController extends Controller
     {
         try {
             $partners = $this->partnerRepository->getAllPartners();
-            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $partners]);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $partners]);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
         } catch (\Exception $e) {
@@ -71,7 +73,9 @@ class PartnerController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $partner = $this->partnerRepository->updatePartner($request,$id);
+            $attribute = $this->getFillerRequest($request);
+            $partner = $this->partnerRepository->Update($attribute, $id);
+//            $partner = $this->partnerRepository->Update($request,$id);
             return $this->returnSuccessResponse(Response::HTTP_OK, $partner);
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorListAds'));

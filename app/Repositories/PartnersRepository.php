@@ -50,7 +50,6 @@ class PartnersRepository
     public function updatePartner(Request $request, $partnerId)
     {
         $partner = Partner::findOrFail($partnerId);
-
         $partner->name = $request->input('name');
         $partner->description = $request->input('description');
         $partner->address = $request->input('address');
@@ -75,6 +74,35 @@ class PartnersRepository
         return $partner;
     }
 
+    /**
+     * @param array $data
+     * @param $id
+     * @return mixed
+     */
+    public function Update(array $data, $id)
+    {
+        $partner = Partner::findOrFail($id);
+        $partner->name = $data['name'];
+        $partner->description = $data['description'];
+        $partner->address = $data['address'];
+        $partner->link = $data['link'];
+        $partner->contact = $data['contact'];
+
+        $path = Storage::disk('partners')->put("", $data['logo']);
+        $imageUrl = Storage::disk('partners')->url($path);
+        $partner->logo = $imageUrl;
+        $partner->save();
+        foreach ($data['media'] as $file) {
+            $media = new Media();
+            $media->file_name = $file->getClientOriginalName();
+            $media->file_path = url(Storage::disk('partners')->url($file->store('public/partners')));
+            $media->mime_type = $file->getClientMimeType();
+            $partner->media()->save($media);
+        }
+        $partner->save();
+        return $partner;
+
+    }
     /**
      * @param $partnerId
      * @return \Illuminate\Http\JsonResponse
@@ -108,5 +136,7 @@ class PartnersRepository
 
         return $partners;
     }
+
+
 
 }

@@ -84,23 +84,23 @@ class AuthController extends Controller
      */
     public function login(AuthLoginRequest $request)
     {
-        $validatedRequest = $request->validated();
         try {
+            $credentials = $request->validated();
 
-            $user = $this->auth->login($request);
-            if ($user) {
+            if (Auth::attempt($credentials)) {
+                $user = Auth::user();
+                $token = $this->auth->login($request);
                 return $this->returnSuccessResponse(Response::HTTP_OK, [
-                    'user' => Auth::user(),
-                    'token' => $user,
-                    'message' => 'ye are logged in',
-
+                    'user' => $user,
+                    'token' => $token,
+                    'message' => 'You are logged in',
                 ]);
+            } else {
+                return $this->returnErrorResponse(Response::HTTP_UNAUTHORIZED, 'Invalid credentials');
             }
         } catch (\Exception $e) {
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('error sign in'));
         }
-
-
     }
 
     /**

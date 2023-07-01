@@ -16,6 +16,7 @@ Route::middleware(['auth.jwt', 'verified'])->group(function () {
 
 Route::get('notifications/{id}', [UserController::class, 'userNotifications'])->middleware('auth.jwt', 'verified')->name('user.userNotifications');
 Route::get('notifications/unread/{id}', [UserController::class, 'userUnreadNotifications'])->middleware('auth.jwt', 'verified')->name('user.userUnreadNotifications');
+Route::get('messages/unread/{id}', [UserController::class, 'userUnreadMessages'])->middleware('auth.jwt', 'verified')->name('user.userUnreadMessages');
 Route::post('notifications/readone/{id}', [UserController::class, 'markOneNotificationAsRead'])->middleware('auth.jwt', 'verified')->name('user.notificationreadone');
 Route::post('notifications/readall', [UserController::class, 'markAllNotificationsAsRead'])->middleware('auth.jwt', 'verified')->name('user.notificationreadall');
 

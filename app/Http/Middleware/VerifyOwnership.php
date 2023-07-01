@@ -19,8 +19,10 @@ class VerifyOwnership
     {
         $adId = $request->route('id');
         $ad = Ad::findOrFail($adId);
-
         if ($ad->user_id !== auth()->user()->id) {
+            if (auth()->user()->role_id=="2" ) {
+                return $next($request);
+            }
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 

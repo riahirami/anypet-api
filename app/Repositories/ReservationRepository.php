@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\NewNotificationEvent;
 use App\Models\Ad;
 use App\Models\Reservation;
 use App\Models\User;
@@ -39,6 +40,8 @@ class ReservationRepository
         ]);
         if ($reservation) {
             $reservation->receiver->notify(new ReservationNotification($reservation));
+            event(new NewNotificationEvent("App\Notifications\ReservationNotification",$receiver->id,$reservation,null));
+
         }
         return $reservation;
     }
@@ -59,6 +62,8 @@ class ReservationRepository
         $reservation->save();
         if ($reservation) {
             $reservation->receiver->notify(new RespondOnReservationNotification($reservation));
+            event(new NewNotificationEvent("App\Notifications\RespondOnReservationNotification",$reservation->sender_id,$reservation,null));
+
         }
         return $reservation;
 

@@ -115,16 +115,16 @@ class AdController extends Controller
         try {
             $ad = Ad::findOrfail($id);
             $user = auth()->id();
-            if ($ad->user_id == $user) {
+//            if ($ad->user_id == $user) {
 
                 $this->adRepository->delete($id);
 
                 return $this->returnSuccessResponse(Response::HTTP_OK,
                     trans('message.adDeleted')
                 );
-            }
-            else
-                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
+
+//          }  else
+//                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
 
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeleteAd'));
@@ -239,6 +239,18 @@ class AdController extends Controller
         try {
             $ad = $this->adRepository->updateAdStatus($parameters);
 
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.adUpdated'), 'data' => $ad]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+        }
+    }
+
+    public function markAsAdoptedOrReserved(Request $request)
+    {
+
+        $parameters = $this->getStatusQueryParameters($request);
+        try {
+            $ad = $this->adRepository->markAsAdoptedOrReserved($parameters);
             return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.adUpdated'), 'data' => $ad]);
         } catch (\Exception $e) {
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));

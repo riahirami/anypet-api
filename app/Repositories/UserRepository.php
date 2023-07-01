@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\User;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 
 class UserRepository
 {
@@ -35,7 +36,12 @@ class UserRepository
     public function show($id)
     {
 //        $user = User::with('ads', 'comments')->find($id);
-        $user = User::with('ads.media', 'comments.user')->find($id);
+        $user = User::with([
+            'ads' => function ($query) {
+                $query->whereIn('status', [2, 3, 4])->with('media');
+            },
+            'comments.user'
+        ])->find($id);
 
         return $user;
     }
@@ -54,15 +60,31 @@ class UserRepository
      * @param $user_id
      * @return mixed
      */
+
     public function getNotifications($user_id)
     {
         $user = User::find($user_id);
         $notifications = $user->userNotifications()->get();
-//        if ($notifications && $notifications->notifiable_id !== $user->id) {
-//            return response()->json(['error' => 'Unauthorized'], 401);
-//        }
-        return $notifications;
+
+        $notificationTypes = [
+            'ReservationNotification' => [],
+            'MessageNotification' => [],
+            'AdMatchingInterrestNotification' => [],
+            'RespondOnReservationNotification' => [],
+            'AdCommented' => [],
+            'AdStatusUpdated' => [],
+        ];
+
+        foreach ($notifications as $notification) {
+            $type = class_basename($notification->type);
+            if (array_key_exists($type, $notificationTypes)) {
+                $notificationTypes[$type][] = $notification;
+            }
+        }
+
+        return $notificationTypes;
     }
+
 
     /**
      * @param $user_id
@@ -71,13 +93,24 @@ class UserRepository
     public function unreadNotifications($user_id)
     {
         $user = User::find($user_id);
-        $notifications = $user->userNotifications()->unread()->get();
-//        if ($notifications && $notifications->notifiable_id !== $user->id) {
-//            return response()->json(['error' => 'Unauthorized'], 401);
-//
-//        }
-            return $notifications;
+        $notifications = $user->userNotifications()
+            ->where('type', '!=', 'App\\Notifications\\MessageNotification')
+            ->unread()
+            ->get();
 
+        return $notifications;
+    }
+
+    public function unreadMessage($user_id)
+    {
+        $user = User::find($user_id);
+        $notifications = $user->userNotifications()
+            ->where('type', '=', 'App\\Notifications\\MessageNotification')
+            ->where('data->senderId', '!=', $user->id)
+            ->unread()
+            ->get();
+
+        return $notifications;
     }
 
     /**
@@ -86,13 +119,13 @@ class UserRepository
      */
     public function markOneNotificationsAsRead($notificationId)
     {
-        $notification = DatabaseNotification::findOrFail($notificationId);
-
         $user = Auth::user();
-        if ($notification && $notification->notifiable_id === $user->id) {
-            $notification->markAsRead();
-            return response()->json(['error' => 'Unauthorized'], 401);
 
+        $notification = DatabaseNotification::where('notifiable_id', $user->id)
+            ->where('data->messageId', $notificationId)
+            ->first();
+        if ($notification) {
+            $notification->markAsRead();
         }
         return $notification;
 

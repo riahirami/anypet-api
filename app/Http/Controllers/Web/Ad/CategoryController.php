@@ -94,7 +94,7 @@ class CategoryController extends \App\Http\Controllers\Controller
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorUpdatecategory'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 
