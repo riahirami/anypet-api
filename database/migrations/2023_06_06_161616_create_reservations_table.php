@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('ad_id')->unsigned();
-            $table->integer('sender_id')->unsigned();
-            $table->integer('receiver_id')->unsigned();
+            $table->unsignedBigInteger('sender_id');
+            $table->unsignedBigInteger('receiver_id');
             $table->text('message')->nullable();
             $table->string('reservation_date')->nullable();
             $table->integer('status')->default(0);
