@@ -16,10 +16,12 @@ Route::middleware(['auth.jwt', 'verified'])->group(function () {
 
 Route::get('notifications/{id}', [UserController::class, 'userNotifications'])->middleware('auth.jwt', 'verified')->name('user.userNotifications');
 Route::get('notifications/unread/{id}', [UserController::class, 'userUnreadNotifications'])->middleware('auth.jwt', 'verified')->name('user.userUnreadNotifications');
+Route::get('messages/unread/{id}', [UserController::class, 'userUnreadMessages'])->middleware('auth.jwt', 'verified')->name('user.userUnreadMessages');
 Route::post('notifications/readone/{id}', [UserController::class, 'markOneNotificationAsRead'])->middleware('auth.jwt', 'verified')->name('user.notificationreadone');
 Route::post('notifications/readall', [UserController::class, 'markAllNotificationsAsRead'])->middleware('auth.jwt', 'verified')->name('user.notificationreadall');
 
 
 Route::post('message/{receiver_id}', [MesssageController::class, 'sendMessage'])->name('user.SendMessage');
+Route::post('contact-us', [MesssageController::class, 'contactAdmin'])->name('user.contactAdmin');
 Route::get('conversation/{user_id}', [MesssageController::class, 'getConversationMsg'])->name('user.conversationMsg');
 Route::get('conversations/list', [MesssageController::class, 'conversations'])->name('user.getConversations');

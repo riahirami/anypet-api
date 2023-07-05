@@ -52,11 +52,13 @@ class RoleChangedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        return [
+              $newUrl = 'http://localhost:3000/profile/';
+
+            return [
             'id' => Str::uuid(), // Generate a new UUID
             'role_id' => $this->newRole->id,
             'role' => $this->newRole->role,
-            'url' => url('/profile/'),
+            'url' => $newUrl,
 
         ];
     }

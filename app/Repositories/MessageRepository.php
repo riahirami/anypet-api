@@ -82,16 +82,15 @@ class MessageRepository
         $sender_id = auth()->id();
 
         $admin = User::query()->where('role_id','2')->get()->first();
-
         $msg = Messages::create([
             'sender_id' => $sender_id,
             'receiver_id' => intval($admin->id),
             'message' => $request->message,
         ]);
         $sender_avatar = $msg->sender->avatar;
-        $receiver_avatar = $msg->receiver->avatar;
 
         $msg->receiver->notify(new MessageNotification($msg));
+
         return response()->json(['message' => 'your message has been send successfully'], 201);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 
+use App\Events\NewNotificationEvent;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\RoleChangedNotification;
@@ -21,6 +22,8 @@ class RoleRepository
         if ($user) {
             $newRole = Role::find(2);
             $user->notify(new RoleChangedNotification($newRole));
+            event(new NewNotificationEvent("App\Notifications\RoleChangedNotification",$user->id,$user,null));
+
         }
         return $user;
     }
@@ -37,6 +40,8 @@ class RoleRepository
         if ($user) {
             $newRole = Role::find(1);
             $user->notify(new RoleChangedNotification($newRole));
+            event(new NewNotificationEvent("App\Notifications\RoleChangedNotification",$user->id,$user,null));
+
         }
         return $user;
     }

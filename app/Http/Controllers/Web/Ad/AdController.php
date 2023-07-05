@@ -94,8 +94,9 @@ class AdController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $attribute = $this->getFillerRequest($request);
         try {
-            $attribute = $this->getFillerUpdateRequest($request);
+
             $ad = $this->adRepository->update($attribute, $id);
             return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $ad]);
         } catch (ModelNotFoundException) {
@@ -115,16 +116,16 @@ class AdController extends Controller
         try {
             $ad = Ad::findOrfail($id);
             $user = auth()->id();
-            if ($ad->user_id == $user) {
+//            if ($ad->user_id == $user) {
 
                 $this->adRepository->delete($id);
 
                 return $this->returnSuccessResponse(Response::HTTP_OK,
                     trans('message.adDeleted')
                 );
-            }
-            else
-                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
+
+//          }  else
+//                return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.unauthorized'));
 
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorDeleteAd'));
@@ -245,6 +246,18 @@ class AdController extends Controller
         }
     }
 
+    public function markAsAdoptedOrReserved(Request $request)
+    {
+
+        $parameters = $this->getStatusQueryParameters($request);
+        try {
+            $ad = $this->adRepository->markAsAdoptedOrReserved($parameters);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['message' => trans('message.adUpdated'), 'data' => $ad]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+        }
+    }
+
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -328,7 +341,7 @@ class AdController extends Controller
         } catch (ModelNotFoundException) {
             return $this->returnErrorResponse(Response::HTTP_NOT_FOUND, trans('message.errorFindAd'));
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 }

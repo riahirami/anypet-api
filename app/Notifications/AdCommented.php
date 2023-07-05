@@ -38,10 +38,11 @@ class AdCommented extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
-    {
+    {        $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
+
         return (new MailMessage)
             ->line('Your ad "' . $this->ad->title . '" has been commented by another user.')
-            ->action('View Ad', url('/ads/' . $this->ad->id))
+            ->action('View Ad', $newUrl)
             ->line('Thank you for using AnyPet!');
     }
 
@@ -52,11 +53,13 @@ class AdCommented extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
+
         return [
             'id' => Str::uuid(),
             'title' => $this->ad->title,
             'status' => $this->ad->status,
-            'url' => url('/ads/' . $this->ad->id),
+            'url' => $newUrl,
         ];
     }
 }

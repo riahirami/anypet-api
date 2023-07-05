@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\NewNotificationEvent;
 use App\Models\Ad;
 use App\Models\Reservation;
 use App\Models\User;
@@ -22,7 +23,7 @@ class ReservationRepository
             'ad_id' => 'required|exists:ads,id',
             'receiver_id' => 'required|exists:users,id',
             'message' => 'nullable',
-            'reservation_date' => 'nullable',
+            'reservation_date' => 'required',
         ]);
 
         $sender = auth()->user();
@@ -35,10 +36,12 @@ class ReservationRepository
             'receiver_id' => $receiver->id,
             'message' => $validatedData['message'],
             'reservation_date' => $validatedData['reservation_date'],
-            'status' => 'pending',
+            'status' => 'waiting',
         ]);
         if ($reservation) {
             $reservation->receiver->notify(new ReservationNotification($reservation));
+            event(new NewNotificationEvent("App\Notifications\ReservationNotification",$receiver->id,$reservation,null));
+
         }
         return $reservation;
     }
@@ -59,6 +62,8 @@ class ReservationRepository
         $reservation->save();
         if ($reservation) {
             $reservation->receiver->notify(new RespondOnReservationNotification($reservation));
+            event(new NewNotificationEvent("App\Notifications\RespondOnReservationNotification",$reservation->sender_id,$reservation,null));
+
         }
         return $reservation;
 

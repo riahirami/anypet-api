@@ -52,6 +52,8 @@ class MessageNotification extends Notification
         return [
             'id' => Str::uuid(),
             'message' => $this->message->message,
+            'messageId' => $this->message->id,
+            'senderId' => $this->message->sender_id ,
             'sender' => $this->message->sender->firstname. " ".$this->message->sender->lastname ,
             'url' => url(':3000/users/conversation/' . $this->message->sender_id),
         ];

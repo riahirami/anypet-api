@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Ad\AdController;
 
 Route::middleware(['auth.jwt', 'verified', 'owner'])->group(function () {
-    Route::put('/{id}', [AdController::class, 'update'])->name('ads.update');
     Route::delete('/{id}', [AdController::class, 'destroy'])->name('ads.destroy');
+    Route::post('/updateads/{id}', [AdController::class, 'update'])->name('ads.update');
+
 });
 
 Route::middleware(['auth.jwt', 'verified', 'role'])->group(function () {
@@ -18,6 +19,7 @@ Route::middleware(['auth.jwt', 'verified', 'role'])->group(function () {
 });
 
 Route::middleware(['auth.jwt', 'verified'])->group(function () {
+    Route::get('/mark-as', [AdController::class, 'markAsAdoptedOrReserved'])->name('ads.adoptedOrReserved');
     Route::get('/listfavorite/{id}', [AdController::class, 'getlistFavoriteAds'])->name('favorite-ads.list');
     Route::get('/myads/{id}', [AdController::class, 'getlistUserAds'])->name('user-ads.list');
     Route::get('/allmedia', [AdController::class, 'getAllMedia'])->name('allmedia.list');

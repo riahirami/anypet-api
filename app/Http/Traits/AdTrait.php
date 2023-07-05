@@ -39,8 +39,9 @@ trait AdTrait
             'street' => $request->input('street'),
             'postal_code' => $request->input('postal_code'),
             'category_id' => $request->input('category_id'),
-            'media' => $request->file('media') // Remove '*'
+            'media' => $request->file('media'),
         ];
+
 
         return $data;
     }
@@ -60,6 +61,7 @@ trait AdTrait
             'status' => $request->input('status'),
             'state' => $request->input('state'),
             'date' => $request->input('date'),
+            'category' => $request->input('category'),
 
         ];
     }

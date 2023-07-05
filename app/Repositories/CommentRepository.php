@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\NewNotificationEvent;
 use App\Models\Ad;
 use App\Models\Comment;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class CommentRepository
         $comment->user_id = $user_id;
         $comment->ad_id = $ad_id;
         $comment->save();
+        event(new NewNotificationEvent("App\Notifications\AdCommented",$ad->user_id,$comment,null));
 
         return $comment;
     }
@@ -39,6 +41,7 @@ class CommentRepository
             $comment->ad_id = $ad_id;
             $comment->parent_id = $parent_id;
             $comment->save();
+            event(new NewNotificationEvent("App\Notifications\AdCommented",$ad->user_id,$comment,null));
 
             return $comment;
         }

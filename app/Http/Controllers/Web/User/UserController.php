@@ -94,6 +94,15 @@ class UserController extends Controller
             return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
         }
     }
+    public function userUnreadMessages($user_id)
+    {
+        try {
+            $notifications = $this->userRepository->unreadMessage($user_id);
+            return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notifications]);
+        } catch (\Exception $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+        }
+    }
 
     /**
      * @param $notification_id
@@ -106,7 +115,7 @@ class UserController extends Controller
 
             return $this->returnSuccessResponse(Response::HTTP_OK, ['data' => $notification]);
         } catch (\Exception $e) {
-            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans('message.ERROR'));
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
         }
     }
 

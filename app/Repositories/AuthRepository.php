@@ -21,12 +21,19 @@ use Illuminate\Validation\ValidationException;
 class AuthRepository
 {
 
+    /**
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
     public function profile()
     {
         //        $token = Auth::login($user);
         return Auth::user();
     }
 
+    /**
+     * @param Request $request
+     * @return string
+     */
     public function setAvatar(Request $request)
     {
 
@@ -38,6 +45,10 @@ class AuthRepository
         return $imageUrl;
     }
 
+    /**
+     * @param AuthLoginRequest $request
+     * @return bool
+     */
     public function login(AuthLoginRequest $request)
     {
 
@@ -47,6 +58,10 @@ class AuthRepository
 
     }
 
+    /**
+     * @param AuthRegistreRequest $request
+     * @return void
+     */
     public function register(AuthRegistreRequest $request)
     {
         if (!Auth::user()) {
@@ -64,6 +79,31 @@ class AuthRepository
         }
     }
 
+    /**
+     * @param AuthRegistreRequest $request
+     * @return \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $user->update([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+
+        return $user;
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout()
     {
         if (Auth::check()) {
@@ -79,22 +119,38 @@ class AuthRepository
 
     }
 
+    /**
+     * @return mixed
+     */
     public function refresh()
     {
         return Auth::refresh();
     }
 
+    /**
+     * @param EmailVerificationRequest $request
+     * @return void
+     */
     public function SendEmailVerification(EmailVerificationRequest $request)
     {
         $request->fulfill();
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function ResendEmailVerification(Request $request)
     {
         return $request->user()->sendEmailVerificationNotification();
 
     }
 
+    /**
+     * @param AuthForgotPasswordeRequest $request
+     * @return string
+     * @throws ValidationException
+     */
     public function forgotPassword(AuthForgotPasswordeRequest $request)
     {
         $status = Password::sendResetLink(
@@ -108,6 +164,10 @@ class AuthRepository
         ]);
     }
 
+    /**
+     * @param AuthResetPasswordeRequest $request
+     * @return mixed|null
+     */
     public function resetPassword(AuthResetPasswordeRequest $request)
     {
         $status = Password::reset(

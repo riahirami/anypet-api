@@ -43,7 +43,7 @@ class Comment extends Model
 
     public static function getAllCommentsWithReplies($adId)
     {
-        $comments = Comment::with('user', 'replyComments','replyComments.user')
+        $comments = Comment::with('user', 'ad','replyComments','replyComments.user')
             ->where('ad_id', $adId)
             ->whereNull('parent_id')
             ->orderBy('created_at', 'desc')

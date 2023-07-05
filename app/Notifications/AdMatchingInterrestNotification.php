@@ -37,11 +37,12 @@ class AdMatchingInterrestNotification extends Notification
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
-    {
+    {        $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
+
         return (new MailMessage)
             ->line('A new ad has been added on the same category of one of your favorite ad.')
             ->line('Title: ' . $this->ad->title)
-            ->action("Don't miss it", url('/ads/' . $this->ad->id))
+            ->action("Don't miss it", $newUrl)
             ->line('Thank you for using AnyPet!');
     }
 
@@ -51,11 +52,12 @@ class AdMatchingInterrestNotification extends Notification
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
-    {
+    {         $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
+
         return [
             'ad_id' => $this->ad->id,
             'title' => $this->ad->title,
-            'url' => url('/ads/' . $this->ad->id),
+            'url' => $newUrl,
 
 
         ];

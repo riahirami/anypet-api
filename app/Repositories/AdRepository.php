@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\NewNotificationEvent;
 use App\Http\Requests\Ad\AdRequest;
 use App\Http\Traits\AdTrait;
 use App\Models\Ad;
@@ -31,6 +32,7 @@ class AdRepository
             ->byStatus($parameters['status'])
             ->byDate($parameters['date'])
             ->byState($parameters['state'])
+            ->byCategories($parameters['category'])
             ->orderBy($parameters['orderBy'], $parameters['orderDirection'])
             ->paginate($parameters['perPage'], ['*'], null, $parameters['page']);
     }
@@ -90,10 +92,8 @@ class AdRepository
     function update(array $data, $id)
     {
         $ad = Ad::findOrFail($id);
-        $user = auth()->id();
-        if ($ad->user_id == $user) {
-//            $ad = AD::destroy($id);
-
+        $userID = auth()->id();
+        if ($ad->user_id == $userID) {
             $ad->title = $data['title'];
             $ad->description = $data['description'];
             $ad->state = $data['state'];
@@ -101,7 +101,10 @@ class AdRepository
             $ad->street = $data['street'];
             $ad->postal_code = $data['postal_code'];
             $ad->category_id = $data['category_id'];
-            $ad->save();
+            $ad->status = 0;
+            $ad->user_id = $userID;
+            $ad->media()->delete();
+
             if (isset($data['media'])) {
                 foreach ($data['media'] as $file) {
                     $media = new Media();
@@ -111,6 +114,7 @@ class AdRepository
                     $ad->media()->save($media);
                 }
             }
+            $ad->save();
             return $ad;
         } else
             return response()->json(['message' => trans('message.unauthorized')]);
@@ -153,8 +157,8 @@ class AdRepository
      */
     public function getAdsByCategory($categoryId)
     {
-        $ads = Ad::with('media', 'user')->byCategory($categoryId)
-            ->byStatus('2')
+        $ads = Ad::with('media', 'user')->byCategories($categoryId)
+            ->byStatus(['4', '3', '2']) // Pass an array of status values
             ->paginate(10, ['*'], null, 1);
 //        ->get();
         return $ads;
@@ -190,10 +194,10 @@ class AdRepository
         $ad = Ad::findOrFail($parameters['id']);
         $ad->status = $parameters['status'];
         $ad->save();
-        if($ad){
+        if ($ad) {
             $ad->user->notify(new AdStatusUpdated($ad));
 //            $latestNotification = $ad->user->notifications()->latest()->first();
-
+            event(new NewNotificationEvent("App\Notifications\AdStatusUpdated", $ad->user_id, $ad, null));
         }
         return $ad;
     }
@@ -260,8 +264,20 @@ class AdRepository
      */
     public function delete($id)
     {
-            $ad = Ad::destroy($id);
-            return $ad;
+        $ad = Ad::destroy($id);
+        return $ad;
+    }
+
+    /**
+     * @param array $parameters
+     * @return mixed
+     */
+    public function markAsAdoptedOrReserved(array $parameters)
+    {
+        $ad = Ad::findOrFail($parameters['id']);
+        $ad->status = $parameters['status'];
+        $ad->save();
+        return $ad;
     }
 
 }

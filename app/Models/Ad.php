@@ -48,7 +48,7 @@ class Ad extends Model
 
     public function scopeUserAdList($query, $userId)
     {
-        $query = $query->where('user_id', $userId);
+        $query = $query->where('user_id', $userId)->orderBy('created_at','desc');
         return $query;
     }
     public function scopeByDate($query, $date)
@@ -60,9 +60,9 @@ class Ad extends Model
         return $query;
     }
 
-    public function scopeByCategory($query, $id)
-    {
-        return $query->where('category_id', $id);
+    public function scopeByCategories($query, $category)
+    {if (isset($category))
+        return $query->where('category_id', $category);
     }
     public function scopeByState($query, $state)
     {  if (isset($state))
@@ -71,8 +71,11 @@ class Ad extends Model
 
     public function scopeByStatus($query, $status)
     {
-        if (isset($status))
+        if (isset($status) && is_array($status)) {
+            return $query->whereIn('status', $status);
+        } else if (isset($status)) {
             return $query->where('status', $status);
+        }
     }
 
     public function scopeByKeyword($query, $keyword)

@@ -36,10 +36,11 @@ class RespondOnReservationNotification extends Notification
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
-    {
+    {        $newUrl = 'http://localhost:3000/advertise/' . $this->reservation->advertisement->id;
+
         return (new MailMessage)
             ->line('Your reservation request for the advertisement "' . $this->reservation->advertisement->title . '" has been updated by '. $this->reservation->receiver->firstname )
-            ->action('View Reservation', url('/reservation/show/myreservation'))
+            ->action('View Reservation', $newUrl)
             ->line('Thank you for using Anypet !');
     }
 
@@ -50,13 +51,15 @@ class RespondOnReservationNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $newUrl = 'http://localhost:3000/advertise/' . $this->reservation->advertisement->id;
+
         return [
             'id' => Str::uuid()->toString(), // Generate a new UUID
             'ad' => $this->reservation->advertisement->title,
             'receiver' => $this->reservation->receiver,
             'sender' => $this->reservation->sender,
             'status' => $this->reservation->status,
-            'url' => url('/ads/' . $this->reservation->advertisement->id)
+            'url' => $newUrl
         ];
     }
 }

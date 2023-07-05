@@ -42,37 +42,35 @@ class PartnersRepository
         return $partner;
     }
 
+
     /**
-     * @param Request $request
-     * @param $partnerId
+     * @param array $data
+     * @param $id
      * @return mixed
      */
-    public function updatePartner(Request $request, $partnerId)
+    public function Update(array $data, $id)
     {
-        $partner = Partner::findOrFail($partnerId);
+        $partner = Partner::findOrFail($id);
+        $partner->name = $data['name'];
+        $partner->description = $data['description'];
+        $partner->address = $data['address'];
+        $partner->link = $data['link'];
+        $partner->contact = $data['contact'];
 
-        $partner->name = $request->input('name');
-        $partner->description = $request->input('description');
-        $partner->address = $request->input('address');
-        $partner->link = $request->input('link');
-        $partner->contact = $request->input('contact');
-
-        $path = Storage::disk('partners')->put("", $request->file('logo'));
+        $path = Storage::disk('partners')->put("", $data['logo']);
         $imageUrl = Storage::disk('partners')->url($path);
         $partner->logo = $imageUrl;
-
-        $partner->save();
-
-        foreach ($request->media as $file) {
-            $media = new Media();
-            $media->file_name = $file->getClientOriginalName();
-            $media->file_path = url(Storage::disk('partners')->url($file->store('public/partners')));
-            $media->mime_type = $file->getClientMimeType();
-            $partner->media()->save($media);
-        }
-
+        $partner->media()->delete();
+        foreach ($data['media'] as $file) {
+                $media = new Media();
+                $media->file_name = $file->getClientOriginalName();
+                $media->file_path = url(Storage::url($file->store('public/partners')));
+                $media->mime_type = $file->getClientMimeType();
+                $partner->media()->save($media);
+            }
         $partner->save();
         return $partner;
+
     }
 
     /**
@@ -108,5 +106,6 @@ class PartnersRepository
 
         return $partners;
     }
+
 
 }
