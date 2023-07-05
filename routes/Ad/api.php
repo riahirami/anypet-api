@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Ad\AdController;
 
 Route::middleware(['auth.jwt', 'verified', 'owner'])->group(function () {
-    Route::put('/{id}', [AdController::class, 'update'])->name('ads.update');
     Route::delete('/{id}', [AdController::class, 'destroy'])->name('ads.destroy');
+    Route::post('/updateads/{id}', [AdController::class, 'update'])->name('ads.update');
 
 });
 

@@ -53,13 +53,14 @@ class AdStatusUpdated extends Notification
                 $statusMessage = 'Your ad status has been updated.';
                 break;
         }
+        $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
 
         return (new MailMessage)
             ->subject('Ad Status Updated')
             ->line($this->ad->user->firstname . ' your ad status has been updated.')
             ->line('Title: ' . $this->ad->title)
             ->line('New Status: ' . $statusMessage)
-            ->action('View Ad', url('/ads/' . $this->ad->id))
+            ->action('View Ad', $newUrl)
             ->line('Thank you for using AnyPet!');
 
 
@@ -71,12 +72,13 @@ class AdStatusUpdated extends Notification
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
-    {
+    {        $newUrl = 'http://localhost:3000/advertise/' . $this->ad->id;
+
         return [
             'id' => Str::uuid(), // Generate a new UUID
             'title' => $this->ad->title,
             'status' => $this->ad->status,
-            'url' => url('/ads/' . $this->ad->id),
+            'url' => $newUrl,
         ];
     }
 }

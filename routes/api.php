@@ -34,6 +34,7 @@ Route::post('email/resend-verification', [AuthController::class,'ResendEmailVeri
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'reset'])->name('password.reset');
 Route::post('avatar', [AuthController::class, 'updateAvatar'])->name('avatar');
+Route::post('update', [AuthController::class, 'updateInformation'])->middleware(['auth','verified'])->name('update');
 
 Route::post('contact-us', [MesssageController::class, 'contactAdmin'])->name('contactAdmin');
 

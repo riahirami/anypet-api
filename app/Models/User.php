@@ -114,13 +114,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function notifyIfNewAdInFavoriteCategoryAdded(Ad $ad)
     {
-        // Check if the user has a favorite ad in the same category as the new ad
         $hasFavoriteAdInCategory = $this->favoriteAds()
             ->where('category_id', $ad->category_id)
             ->exists();
 
         if ($hasFavoriteAdInCategory) {
-            // Notify the user about the new ad in their favorite category
             $this->notify(new AdMatchingInterrestNotification($ad));
         }
     }

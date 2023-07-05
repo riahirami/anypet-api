@@ -39,7 +39,7 @@ trait AdTrait
             'street' => $request->input('street'),
             'postal_code' => $request->input('postal_code'),
             'category_id' => $request->input('category_id'),
-            'media' => $request->file('media'), // Remove '*'
+            'media' => $request->file('media'),
         ];
 
 

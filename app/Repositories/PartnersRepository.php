@@ -42,37 +42,6 @@ class PartnersRepository
         return $partner;
     }
 
-    /**
-     * @param Request $request
-     * @param $partnerId
-     * @return mixed
-     */
-    public function updatePartner(Request $request, $partnerId)
-    {
-        $partner = Partner::findOrFail($partnerId);
-        $partner->name = $request->input('name');
-        $partner->description = $request->input('description');
-        $partner->address = $request->input('address');
-        $partner->link = $request->input('link');
-        $partner->contact = $request->input('contact');
-
-        $path = Storage::disk('partners')->put("", $request->file('logo'));
-        $imageUrl = Storage::disk('partners')->url($path);
-        $partner->logo = $imageUrl;
-
-        $partner->save();
-
-        foreach ($request->media as $file) {
-            $media = new Media();
-            $media->file_name = $file->getClientOriginalName();
-            $media->file_path = url(Storage::disk('partners')->url($file->store('public/partners')));
-            $media->mime_type = $file->getClientMimeType();
-            $partner->media()->save($media);
-        }
-
-        $partner->save();
-        return $partner;
-    }
 
     /**
      * @param array $data
@@ -91,18 +60,19 @@ class PartnersRepository
         $path = Storage::disk('partners')->put("", $data['logo']);
         $imageUrl = Storage::disk('partners')->url($path);
         $partner->logo = $imageUrl;
-        $partner->save();
+        $partner->media()->delete();
         foreach ($data['media'] as $file) {
-            $media = new Media();
-            $media->file_name = $file->getClientOriginalName();
-            $media->file_path = url(Storage::disk('partners')->url($file->store('public/partners')));
-            $media->mime_type = $file->getClientMimeType();
-            $partner->media()->save($media);
-        }
+                $media = new Media();
+                $media->file_name = $file->getClientOriginalName();
+                $media->file_path = url(Storage::url($file->store('public/partners')));
+                $media->mime_type = $file->getClientMimeType();
+                $partner->media()->save($media);
+            }
         $partner->save();
         return $partner;
 
     }
+
     /**
      * @param $partnerId
      * @return \Illuminate\Http\JsonResponse
@@ -136,7 +106,6 @@ class PartnersRepository
 
         return $partners;
     }
-
 
 
 }

@@ -59,6 +59,21 @@ class AuthController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateInformation(Request $request)
+    {
+        try {
+            $user = $this->auth->update($request);
+            return $this->returnSuccessResponse(Response::HTTP_CREATED, ['data' => $user]);
+        } catch (HttpClientException $e) {
+            return $this->returnErrorResponse(Response::HTTP_INTERNAL_SERVER_ERROR, trans($e->getMessage()));
+
+        }
+    }
+
+    /**
      * @return JsonResponse
      */
     public function profile()

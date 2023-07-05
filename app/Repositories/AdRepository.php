@@ -92,10 +92,8 @@ class AdRepository
     function update(array $data, $id)
     {
         $ad = Ad::findOrFail($id);
-        $user = auth()->id();
-        if ($ad->user_id == $user) {
-//            $ad = AD::destroy($id);
-
+        $userID = auth()->id();
+        if ($ad->user_id == $userID) {
             $ad->title = $data['title'];
             $ad->description = $data['description'];
             $ad->state = $data['state'];
@@ -104,7 +102,9 @@ class AdRepository
             $ad->postal_code = $data['postal_code'];
             $ad->category_id = $data['category_id'];
             $ad->status = 0;
-            $ad->save();
+            $ad->user_id = $userID;
+            $ad->media()->delete();
+
             if (isset($data['media'])) {
                 foreach ($data['media'] as $file) {
                     $media = new Media();
@@ -114,6 +114,7 @@ class AdRepository
                     $ad->media()->save($media);
                 }
             }
+            $ad->save();
             return $ad;
         } else
             return response()->json(['message' => trans('message.unauthorized')]);
@@ -196,7 +197,7 @@ class AdRepository
         if ($ad) {
             $ad->user->notify(new AdStatusUpdated($ad));
 //            $latestNotification = $ad->user->notifications()->latest()->first();
-            event(new NewNotificationEvent("App\Notifications\AdStatusUpdated",$ad->user_id,$ad,null));
+            event(new NewNotificationEvent("App\Notifications\AdStatusUpdated", $ad->user_id, $ad, null));
         }
         return $ad;
     }
